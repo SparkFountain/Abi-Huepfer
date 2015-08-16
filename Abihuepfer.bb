@@ -1,7 +1,9 @@
 AppTitle("Abi-Huepfer 1.1") ; Title of the game and version
 
 ; Graphics, Buffer and Random generator
-Graphics(640,480,32,2)
+Global screenWidth = 1024
+Global screenHeight = 768
+Graphics(screenWidth,screenHeight,32,2)
 SetBuffer(BackBuffer())
 SeedRnd(MilliSecs())
 
@@ -313,15 +315,13 @@ Global doTut = 1 ; start with the tutorial? (1=yes, 0=no)
 
 ;player specific variables
 Global doDrawPlayer = 1  ; shall the program draw the player?
-Global player_posx = 320 ; \ positioned in the middle of the screen
-Global player_posy = 256 ; /
+Global player_posx = (screenWidth/2) ; \ positioned in the middle of the screen
+Global player_posy = (screenHeight/2) ; /
 Global frame = 0		 ; the frame 
 Global time = 0			 ; checks when a frame has to be changed
 Global movingRight ; whether he moves in right or left direction
 Global movX = -288 ; these variables change if the player is moving
 Global movY = 480 ; starting point level 1: right bottom
-
-Global xyz ; just a variable to set the actual level coordinates
 
 ;Abi-specific
 Global mark#	; what mark gets the player at the end?
@@ -350,97 +350,42 @@ Global throwBook = LoadSound("sfx/ThrowBook.wav")	  ; book is thrown
 Global eat = LoadSound("sfx/Eat.wav")				  ; eats a sandwich
 Global monsterDie = LoadSound("sfx/MonsterDie.wav")	  ; monster disappears
 Global levelAgain = LoadSound("sfx/LevelAgain.wav")	  ; when restarting a level
-Global backGround = PlayMusic("Back.mid") ; background melody
+Global backGround = PlayMusic("sfx/Jumpin' in the School.mid") ; background melody
+ChannelVolume(backGround,0.33)
 
 ;the following constants include the text for the tutorial-level
-Const TUT0$ = "Herzlich willkommen beim Abi-Hüpfer!"
-Const Tut1$ = "In diesem Tutorial, der so genannten Einführungsphase, wirst du mit den wichtigsten Elementen des Spiels vertraut gemacht."
-Const TUT2$ = "Bist du bereit? Drücke auf [Enter], um fortzufahren."
-Const TUT3$ = "(Hinweis: Du kannst dieses Tutorial mit einem Cheat überspringen, indem du Strg+C drückst und dann 'Level+' eingibst.)"
-Const TUT4$ = "Du solltest erst einmal einige grundlegende Dinge über das Abitur wissen."
-Const TUT5$ = "Wie im richtigen Leben besteht der Weg zum Abitur aus vier Kurshalbjahren und den Abi-Prüfungen."
-Const TUT6$ = "Für jedes Halbjahr gibt es einen Level, in dem du Punkte sammelst, die du später für das Abitur brauchst."
-Const TUT7$ = "Die Schwierigkeitsstufe steigt mit jedem Level an."
-Const TUT8$ = "Wenn du alle vier Kurshalbjahre abgeschlossen hast, wirst du zum letzten Level, dem Abitur, zugelassen."
-Const TUT9$ = "Du brauchst nach jedem Kurshalbjahr eine bestimmte Anzahl an Punkten, um weiter zu kommen."
-Const TUT10$ = "Solltest du nicht genügend Punkte haben, musst du versuchen, den Level noch einmal zu absolvieren."
-Const TUT11$ = "Du hast für alle vier Kurshalbjahre insgesamt fünf Versuche."
-Const TUT12$ = "Kommen wir nun zur Steuerung."
-Const TUT13$ = "Du kannst deinen Spieler mit den Pfeiltasten nach links und rechts bewegen."
-Const TUT14$ = "Gehe nun zu dem Wurzelzeichen."
-Const TUT15$ = "Es gibt neun Fächer, für die du unabhängig voneinander Punkte sammelst."
-Const TUT16$ = "Du benötigst nach jedem Level eine bestimmte Punktzahl, um weiter zu kommen."
-Const TUT17$ = "Wenn du durch solch ein Symbol wie dieses Wurzelzeichen läufst, sammelst du es automatisch auf."
-Const TUT18$ = "Dir wird angezeigt, zu welchem Unterrichtsthema das Symbol passt und für welches Fach es dir Punkte bringt."
-Const TUT19$ = "Gehe nun zu dem Sandwich."
-Const TUT20$ = "Jeder Schüler braucht Energie, um gute Leistungen zu erbringen."
-Const TUT21$ = "Du hast links oben am Bildschirm eine Energieanzeige in Prozent."
-Const TUT22$ = "Achte darauf, dass deine Energie nie auf 0% sinkt, denn dann wirst du ohnmächtig und musst den Level noch einmal wiederholen."
-Const TUT23$ = "Momentan ist deine Energie bei 50%. Wenn du nun das Sandwich isst, siehst du, wie deine Energie zunimmt."
-Const TUT24$ = "Siehst du diese dreckige Toilette vor dir?"
-Const TUT25$ = "Es soll Schulen geben, wo die Toiletten regelmäßig mutwillig verschmutzt werden..."
-Const TUT26$ = "Wenn du mal ganz dringend musst und drei dreckverschmierte Klos zur Auswahl hast, kann dir schon mal übel werden."
-Const TUT27$ = "Da du nun das Toiletten-Symbol berührt hast, wirst du gleich sehen, wie deine Energie schwindet."
-Const TUT28$ = "Außer Ekel erregenden Toiletten gibt es auch Monster in der Schule, die einen überfallen und Energie abziehen."
-Const TUT29$ = "Rechts von dir siehst du ein faules, verschlafenes Monster, das furchtbare Langeweile ausstrahlt und den munteren Schüler"
-Const TUT30$ = "schnell trostlos und gleichgültig werden lässt..."
-Const TUT31$ = "Du kannst ein Monster jedoch bekämpfen, indem du mit Strg-rechts ein Schulbuch nach ihm wirfst."
-Const TUT32$ = "Probier' es mal aus! Wenn das Monster verschwunden ist, gehe weiter nach rechts."
-Const TUT33$ = "Andere Monster sorgen dafür, dass dir Punkte abgezogen werden, wenn du mit ihnen in Kontakt kommst."
-Const TUT34$ = "So beispielsweise dieser verkommene Gymnasiast, der mit Zigarette und Bier durchs Schulhaus läuft."
-Const TUT35$ = "Versuche ihn zu eliminieren! Gehe danach weiter nach rechts."
-Const TUT36$ = "Nun zu etwas anderem. Es wird dir vielleicht nicht immer möglich sein, allein durch das Sammeln"
-Const TUT37$ = "von Objekten genug Punkte zu kriegen, um den Level zu verlassen."
-Const TUT38$ = "Deshalb kannst du zusätzlich Geldmünzen einheimsen, die im ganzen Schulhaus verteilt sind."
-Const TUT39$ = "Wofür du sie gebrauchen kannst, dazu kommen wir später."
-Const TUT40$ = "Um auf diese Mauer zu kommen, musst du hochspringen. Drücke auf die Leertaste, um zu springen."
-Const TUT41$ = "Du kannst dann die restlichen Coins einsammeln."
-Const TUT42$ = "Du wirst später feststellen, dass es noch andere Möglichkeiten gibt, an Geld zu kommen."
-Const TUT43$ = "Siehst du diese Personen dort oben? Spring zu ihnen hoch und berühre die erste."
-Const TUT44$ = "Das ist ein Lehrer. Lehrer kannst du daran erkennen, dass sie immer einen Stapel Klausurhefte unter dem Arm mit sich tragen."
-Const TUT45$ = "Außerdem sind sie größer als die Schüler. Mit einem Lehrer kannst du handeln, um dir mehr Punkte zu verschaffen."
-Const TUT46$ = "Für je fünfzehn Coins bekommst du einen Punkt von ihm geschenkt."
-Const TUT47$ = "Solche Bestechungen gibt es natürlich offiziell überhaupt nicht."
-Const TUT48$ = "Sobald sie passiert sind, verschwindet der betroffene Lehrer plötzlich wie vom Erdboden verschluckt..."
-Const TUT49$ = "So wie jetzt. - Moment mal, da steht ja noch jemand neben dir. Geh zu ihm hin."
-Const TUT50$ = "Man könte denken, dass das ein weiterer Lehrer ist. Aber siehst du, dass er kleiner ist und hinterhältiger guckt?"
-Const TUT51$ = "Das ist eine ganz gemeine Petze! Ein Fünftklässler, der sich als Lehrer verkleidet hat und dich veräppeln will."
-Const TUT52$ = "Wenn du mit ihm handelst, dann nimmt er dir dein ganzes Geld weg und rennt sofort zum Schulleiter."
-Const TUT53$ = "Und der zieht dir für den Bestechungsversuch auch noch einige deiner wertvollen Punkte ab! Ein schlechtes Geschäft..."
-Const TUT54$ = "Also merke dir: Handle NIEMALS(!) mit einer Petze!"
-Const TUT55$ = "Gehe nun zur Tür."
-Const TUT56$ = "Du hast es geschafft, die Einführungsphase ist hiermit beendet."
-Const TUT57$ = "Wenn du nun durch diese Tür gehst, kommst du ins erste Kurshalbjahr und es gibt kein Zurück mehr."
-Const TUT59$ = "Dein Geld und deine Punkte werden auf 0, deine Energie auf 100% zurückgesetzt."
-Const TUT60$ = "Viel Spaß und vor allem viel Glück auf deinem Weg zum (virtuellen) Abitur!"
+Dim tutText$(60)
+stream = ReadFile("txt/tutorial.txt")
+Local i
+For i=0 To 60
+	tutText(i) = ReadLine(stream)
+Next
+CloseFile(stream)
 
 ; these constants show the text for the Abi-message
-Const ABI01$ = "Gratuliere! Du hast alle vier Kurshalbjahre erfolgreich absolviert und wirst hiermit zum Abitur zugelassen."
-Const ABI02$ = "Bevor du jedoch gleich in die letzte große Herausforderung startest, hier noch ein paar wichtige Hinweise:"
-Const ABI03$ = "- Du wirst im Abiturlevel mehr Energie verlieren als sonst, wenn du mit Monstern und anderen Items zusammenstößt."
-Const ABI04$ = "Aus diesem Grund gibt es an einigen Orten Energiedrops. Sie sehen aus wie gewöhnliche Münzen mit einem E in der Mitte."
-Const ABI05$ = "Ein Energiedrop gibt dir viermal so viel Energie wie ein einfaches Sandwich."
-Const ABI06$ = "- Es gibt ein neues Monster, den HONK (Hauptschüler ohne nennenswerte Kenntnisse). Er zieht dir sowohl Energie als auch"
-Const ABI07$ = "Punkte ab, wenn du mit ihm zusammenläufst. Außerdem sind Honks schwerer zu besiegen und treten oftmals in Gruppen auf."
-Const ABI08$ = "- Die Lehrer haben während der Abiprüfungen die Aufgabe, die Schüler zu beobachten und sie am Schummeln zu hindern."
-Const ABI09$ = "Es wäre natürlich zu auffällig, wenn du einen Lehrer während der Prüfung versuchen würdest zu bestechen."
-Const ABI10$ = "Aus diesem Grund laufen im Abilevel keine Lehrer herum; du musst dir also deine Punkte ganz alleine beschaffen!"
-Const ABI11$ = "(Das bedeutet natürlich auch, dass kein Geld im Schulhaus herumliegt wie üblich, und da lästige Fünftklässler im Abitur"
-Const ABI12$ = "nichts zu suchen haben, wird es auch keine Petzen geben.)"
-Const ABI13$ = "- Du wirst insgesamt fünf Prüfungen zu absolvieren haben, die schriftlichen in Deutsch, Mathematik, Englisch und Chemie"
-Const ABI14$ = "und eine mündliche Prüfung in Geografie."
-Const ABI15$ = "In den schriftlichen Prüfungen gibt es pro Fach drei neue Symbole, die du suchen musst."
-Const ABI16$ = "Am Ende des Levels musst du von den insgesamt 12 Symbolen mindestens 8 eingesammelt haben, sonst hast du nicht bestanden."
-Const ABI17$ = "In der mündlichen Prüfung sind Symbole aller 7 Kontinente unserer Erde versteckt. Du musst sie ALLE finden, um"
-Const ABI18$ = "zu bestehen!"
-Const ABI19$ = "-Schon eine einzige Abiturprüfung kann sehr lang werden... Aus diesem Grund sind an einigen Stellen in den beiden"
-Const ABI20$ = "Abiturleven kurze Pausen eingebaut. Sie sehen aus wie Viertel- und Achtelpausen in der Notationsschrift."
-Const ABI21$ = "Sobald du ein Pausenzeichen berührst, bleiben ALLE Monster im ganzen Level für einen kurzen Moment dort stehen, wo sie"
-Const ABI22$ = "gerade sind. Dir wird in dieser Zeit auch keine Energie abgezogen, wenn du gegen ein Monster oder eine Toilette oder"
-Const ABI23$ = "etwas dergleichen läufst. Je nach Art der Pause erhälst du eine Viertel- oder eine Achtelminute lang diesen Bonus."
-Const ABI24$ = "- Falls es dir beim ersten Mal nicht gelingen sollte, das Abitur zu bestehen, macht nichts: Du hast für jeden der beiden"
-Const ABI25$ = "Abiturlevel jeweils 3 Versuche! Also bloß keine Panik :)"
-Const ABI26$ = "So, jetzt weißt du bescheid. Bleibt nur noch eins: VIEL ERFOLG BEIM ABITUR!!!"
+Dim abiText(32)
+stream = ReadFile("txt/abitur.txt")
+For i=0 To 32
+	abiText(i) = ReadLine(stream)
+Next
+CloseFile(stream)
+
+;item texts
+Dim itemText(79)
+stream = ReadFile("txt/items.txt")
+For i=0 To 79
+	itemText(i) = ReadLine(stream)
+Next
+CloseFile(stream)
+
+;credit texts
+Dim creditsText(15)
+stream = ReadFile("txt/credits.txt")
+For i=0 To 15
+	creditsText(i) = ReadLine(stream)
+Next
+CloseFile(stream)
+
 
 ; the level coordinates
 Const MOVX_LVL1 = (-288)
@@ -456,7 +401,7 @@ Const Movy_LvlAbi1 = 480
 Const MOVX_LVLAbi2 = 156
 Const Movy_LvlAbi2 = (-32)
 
-ClsColor(Rnd(0,255),Rnd(0,255),Rnd(0,255)) ;sets a random background
+ClsColor(0,0,0)
 
 ;=== MAIN LOOP
 Repeat
@@ -1635,7 +1580,7 @@ Function ChooseLevel()
 		Case 7
 			If start = 0 Then
 				start = 1
-				Level_Abi1()
+				LoadLevel(6)
 				ResumeChannel backGround
 				ClsColor Rnd(0,255),Rnd(0,255),Rnd(0,255)
 			EndIf
@@ -1643,7 +1588,7 @@ Function ChooseLevel()
 			If start = 1 Then
 				start = 0
 				lives = 3 ; three tries to finish the level
-				Level_Abi2()
+				LoadLevel(7)
 				ResumeChannel backGround
 				ClsColor Rnd(0,255),Rnd(0,255),Rnd(0,255)
 			EndIf 
@@ -2317,8 +2262,6 @@ If jumpAllow = 1 Then ; if player is not at the beginning of tutorial level
 		EndIf 
 End Function 
 
-
-
 Function LoadLevel(number)
 	Local newcoin.Coins
 	Local new_energy_object.Energys
@@ -2327,6 +2270,7 @@ Function LoadLevel(number)
 	Local New_teacher.Teacher
 	Local New_sneak.Sneak
 	Local newdoor.Door
+	Local newpause.Pause
 	
 	Local currentLine$
 	Local currentCommaPos
@@ -2425,8 +2369,7 @@ Function LoadLevel(number)
 			CloseFile(stream)
 		Case 2,3,4,5
 			pointMinimum = 70 ; here, the minimum of points that a player has to collect, is set
-			If(xyz=0) Then 		
-				xyz = 1
+			If(xyz=0) Then
 				movX = MOVX_LVL1
 				movY = Movy_Lvl1
 				tut = 0
@@ -2529,185 +2472,91 @@ Function LoadLevel(number)
 				Next
 			Next
 			CloseFile(stream)
+		Case 6,7
+			pointMinimum = creditPoints
+			pointMinimum = (pointMinimum + 240)
+			If(xyz=0) Then
+				xyz = 1
+				movX = MOVX_LVLAbi1
+				movY = Movy_LvlAbi1
+			EndIf 
+			
+			ReadLine(stream)	;energy heading
+			Repeat
+				currentLine$ = ReadLine(stream)
+				If(currentLine$="") Then Exit
+				currentCommaPos = Instr(currentLine,",")
+				new_energy_object.Energys = New Energys
+				new_energy_object\en_x = Left(currentLine,currentCommaPos-1)
+				new_energy_object\en_y = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				new_energy_object\sort = Right(currentLine,1)
+			Forever
+			ReadLine(stream)	;item heading
+			Repeat
+				currentLine$ = ReadLine(stream)
+				If(currentLine$="") Then Exit
+				currentCommaPos = Instr(currentLine,",")
+				newitem.School = New School
+				newitem\School_x = Left(currentLine,currentCommaPos-1)
+				newitem\School_y = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				newitem\School_sort = Right(currentLine,2)
+			Forever
+			ReadLine(stream)	;less energy heading
+			Repeat
+				currentLine$ = ReadLine(stream)
+				If(currentLine$="") Then Exit
+				currentCommaPos = Instr(currentLine,",")
+				new_less_energy_object.Less_energys = New Less_energys
+				new_less_energy_object\less_en_x = Left(currentLine,currentCommaPos-1)
+				new_less_energy_object\less_en_y = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				new_less_energy_object\less_en_sort = Right(currentLine,1)
+			Forever
+			ReadLine(stream)	;monster heading
+			Repeat
+				currentLine$ = ReadLine(stream)
+				If(currentLine$="") Then Exit
+				currentCommaPos = Instr(currentLine,",")
+				new_monster.Monster = New Monster
+				new_monster\Monster_type = Left(currentLine,1)
+				new_monster\Pos_x = Mid(currentLine,3,currentCommaPos-1)
+				new_monster\Pos_y = Mid(currentLine,currentCommaPos+1,3)
+				new_monster\Direction = Mid(currentLine,currentCommaPos+6,1)
+				new_monster\Anim_counter = Mid(currentLine,currentCommaPos+8,1)
+				new_monster\Frame = Mid(currentLine,currentCommaPos+10,1)
+				new_monster\Start_x = Mid(currentLine,currentCommaPos+12,Len(currentLine)-(currentCommaPos+12)-4)
+				new_monster\M_energy = Right(currentLine,3)
+			Forever
+			ReadLine(stream)	;rest heading
+			Repeat
+				currentLine$ = ReadLine(stream)
+				If(currentLine$="") Then Exit
+				currentCommaPos = Instr(currentLine,",")
+				newpause.Pause = New Pause
+				newpause\pos_x = Left(currentLine,currentCommaPos-1)
+				newpause\pos_y = Mid(currentLine,currentCommaPos+1,3)
+				newpause\sort = Right(currentLine,1)
+			Forever
+			ReadLine(stream)	;level door heading
+			Repeat
+				currentLine$ = ReadLine(stream)
+				If(currentLine$="") Then Exit
+				currentCommaPos = Instr(currentLine,",")
+				newdoor.Door = New Door
+				newdoor\pos_x = Left(currentLine,currentCommaPos-1)
+				newdoor\pos_y = Mid(currentLine,currentCommaPos+1,3)
+				newdoor\frame = Right(currentLine,1)
+			Forever
+			ReadLine(stream)	;empty
+			ReadLine(stream)	;bricks heading
+			For bricky = 0 To 24
+				currentLine$ = ReadLine(stream)
+				For brickx = 0 To 181
+					actualLevel(brickx,bricky) = Mid(currentLine,(brickx+1)*2-1,1)
+				Next
+			Next
+			CloseFile(stream)
 	End Select
 End Function
-
-Function Level_Abi1()
-	pointMinimum = creditPoints
-	pointMinimum = (pointMinimum + 240)
-	
-	If(xyz=0) Then
-		xyz = 1
-		movX = MOVX_LVLAbi1
-		movY = Movy_LvlAbi1
-	EndIf 
-	
-	Restore BrickLevelAbi1;original: mapdata
-	For bricky = 0 To 24;original: 21
-		For brickx = 0 To 181;original: 79
-			Read actualLevel(brickx,bricky)
-		Next
-	Next
-		
-	;restore the monsters
-	Restore MonsterLevelAbi1
-	Read number
-	For mi = 1 To number
-		new_monster.Monster = New Monster
-		Read Monstertype, x, y, direction,anim_counter,frame,start_x,m_en
-		new_monster\Monster_type = Monstertype
-		new_monster\Pos_x = x
-		new_monster\Pos_y = y
-		new_monster\Direction = direction
-		new_monster\Anim_counter = anim_counter
-		new_monster\Frame = frame
-		new_monster\Start_x = start_x
-		new_monster\M_energy = m_en
-	Next 
-		
-	;restore energy items
-	Restore EnergyLevelAbi1
-	Read number
-	For i = 1 To number
-		new_energy_object.energys = New Energys
-		Read energy_x,energy_y,energy_sort
-		new_energy_object\en_x = energy_x
-		new_energy_object\en_y = energy_y
-		new_energy_object\sort = energy_sort
-	Next
-	
-	;less energy items
-	Restore LessEnergyLevelAbi1
-	Read number
-	For i = 1 To number
-		new_less_energy_object.less_energys = New Less_energys
-		Read less_energy_x,less_energy_y,less_energy_sort
-		new_less_energy_object\less_en_x = less_energy_x
-		new_less_energy_object\less_en_y = less_energy_y
-		new_less_energy_object\less_en_sort = less_energy_sort
-	Next 
-			
-	;restore all mixed items
-	Restore ItemsLevelAbi1
-	Read number
-	For i = 1 To number
-	newitem.school = New School
-	Read school_x, school_y, school_sort
-	newitem\school_x = school_x
-	newitem\school_y = school_y
-	newitem\school_sort = school_sort
-	Next 
-			
-	;restore the pauses
-	Restore PauseAbi1
-	Read number
-	For i = 1 To number
-		newpause.pause = New Pause
-		Read pos_x,pos_y,sort
-		newpause\pos_x = pos_x
-		newpause\pos_y = pos_y
-		newpause\sort = sort
-	Next
-	
-	;restore the level door
-	Restore DoorLevelAbi1 ;orig.: Door_Level4
-	newdoor.door = New Door
-	Read x,y,frame
-	newdoor\pos_x = x
-	newdoor\pos_y = y
-	newdoor\frame = frame
-
-End Function  
-
-
-Function Level_Abi2()
-
-	creditPoints = pointMinimum
-	pointMinimum = pointMinimum+70
-	
-	If(xyz = 1) Then
-		xyz = 0
-		movX = MOVX_LVLAbi2
-		movY = Movy_LvlAbi2
-	EndIf 
-	
-	Restore BrickLevelAbi2		;original: mapdata
-	For bricky = 0 To 24		;original: 21
-		For brickx = 0 To 181	;original: 79
-			Read actualLevel(brickx,bricky)
-		Next
-	Next
-		
-	;restore the monsters
-	Restore MonsterLevelAbi2
-		Read number
-		For mi = 1 To number
-			new_monster.Monster = New Monster
-			Read Monstertype, x, y, direction,anim_counter,frame,start_x,m_en
-			new_monster\Monster_type = Monstertype
-			new_monster\Pos_x = x
-			new_monster\Pos_y = y
-			new_monster\Direction = direction
-			new_monster\Anim_counter = anim_counter
-			new_monster\Frame = frame
-			new_monster\Start_x = start_x
-			new_monster\M_energy = m_en
-		Next 		
-	
-	;restore energy items
-	Restore EnergyLevelAbi2
-		Read number
-		For i = 1 To number
-			new_energy_object.energys = New Energys
-			Read energy_x,energy_y,energy_sort
-			new_energy_object\en_x = energy_x
-			new_energy_object\en_y = energy_y
-			new_energy_object\sort = energy_sort
-		Next
-	
-	;less energy items
-	Restore LessEnergyLevelAbi2
-		Read number
-		For i = 1 To number
-			new_less_energy_object.less_energys = New Less_energys
-			Read less_energy_x,less_energy_y,less_energy_sort
-			new_less_energy_object\less_en_x = less_energy_x
-			new_less_energy_object\less_en_y = less_energy_y
-			new_less_energy_object\less_en_sort = less_energy_sort
-		Next 
-	
-	;restore all mixed items
-	Restore ItemsLevelAbi2
-			Read number
-			For i = 1 To number
-			newitem.school = New School
-			Read school_x, school_y, school_sort
-			newitem\school_x = school_x
-			newitem\school_y = school_y
-			newitem\school_sort = school_sort
-			Next 
-	
-	;restore the pauses
-	Restore PauseAbi2
-		Read number
-		For i = 1 To number
-			newpause.pause = New Pause
-			Read pos_x,pos_y,sort
-			newpause\pos_x = pos_x
-			newpause\pos_y = pos_y
-			newpause\sort = sort
-		Next
-	
-	;restore the level door
-	Restore DoorLevelAbi2 ;orig.: Door_Level4
-		newdoor.door = New Door
-		Read x,y,frame
-		newdoor\pos_x = x
-		newdoor\pos_y = y
-		newdoor\frame = frame
-
-End Function 
-
 
 Function ShowAbi()
 
@@ -2724,33 +2573,33 @@ Function ShowAbi()
 	
 	Select abiMessage
 		Case 0
-			Text(100,0,"HERZLICHEN GLÜCKWUNSCH!!!")
-			Text(100,90,"Du hast es endlich geschafft und erhälst nun dein wohlverdientes Abitur.")
-			Text(100,150,"Du hast insgesamt "+creditPoints+" Punkte gesammelt.")
-			Text(100,180,"Das entspricht einer virtuellen Note von "+mark#+".")
-			Text(100,240,"Du darfst dir dieses Abiturzeugnis nun ausdrucken und es dir dann an den Hut stecken.")
-			Text(200,430,"Bitte [Enter] drücken um fortzufahren...")
+			Text(100,0,abiText(26))
+			Text(100,90,abiText(27))
+			Text(100,150,abiText(28)+creditPoints+abiText(29))
+			Text(100,180,abiText(30)+mark#+".")
+			Text(100,240,abiText(31))
+			Text(200,430,abiText(32))
 			
 			If(KeyHit(28)) Then abiMessage = abiMessage+1
 			
 		Case 1
 			Cls 
-			Text(120,0,"CREDITS")
-			Text(120,12,"-----------------")
-			Text(120,30,"Programmierung, Leitung und Grafiken:    Stefan Behrendt")
-			Text(120,60,"Sounds:    Hintergrundmusik: 'Boom!' von UnrealSoftware")
-			Text(120,90,"            Jump-Sound: 'JumpTut1'")
-			Text(120,120,"           Sandwich- und Monstersound: 'Stranded II' von Unreal Software")
-			Text(120,150,"           alle anderen Sounds von www.soft-ware.net")
-			Text(120,180,"Ein besonderer Dank für das Testen dieses Spiels geht an:")
-			Text(120,210,"           Christian Radius")
-			Text(120,240,"           Sebastian Nordenbruch")
-			Text(120,270,"           Cornelius Irmscher")
-			Text(120,300,"           Konstantin von Knorre")
-			Text(120,330,"           Tobias König")
-			Text(120,360,"           Anne Hofmeister")
-			Text(120,390,"           ...und alle anderen, falls ich jemanden vergessen haben sollte. Sry^^")
-			Text(120,468,"Mit [Enter] geht's wieder von vorn los...")
+			Text(120,0,creditsText(0))
+			Text(120,12,creditsText(1))
+			Text(120,30,creditsText(2))
+			Text(120,60,creditsText(3))
+			Text(120,90,creditsText(4))
+			Text(120,120,creditsText(5))
+			Text(120,150,creditsText(6))
+			Text(120,180,creditsText(7))
+			Text(120,210,creditsText(8))
+			Text(120,240,creditsText(9))
+			Text(120,270,creditsText(10))
+			Text(120,300,creditsText(11))
+			Text(120,330,creditsText(12))
+			Text(120,360,creditsText(13))
+			Text(120,390,creditsText(14))
+			Text(120,468,creditsText(15))
 			
 			If(KeyHit(28)) Then 
 				Cls()
@@ -2761,7 +2610,6 @@ Function ShowAbi()
 				text_var = 0
 				doTut = 1
 				tut = 0
-				xyz = 0
 				start = 0
 				creditPoints = 0
 				pointMinimum = 0 
@@ -2787,325 +2635,278 @@ Function TextTutorial()
 	If(doTut = 1) Then		;if this tutorial is meant to be played
 		Select text_var
 
-	Case 0 ; the first text
-	tut = 1
-	jumpAllow = 0 ; player is not able to jump
-	moveAny = 0
-
-	Text 10,30,TUT0$
-	Text 10,45,Tut1$
-	Text 10,60,TUT2$
-	Text 10,75,TUT3$
-	
-	If KeyHit(28) Then
-		;player_move = 1 ==> just after the last text
-		text_var = text_var+1
-	EndIf
-	
-	
-	Case 1
-	
-	Text 10,30,TUT4$
-	Text 10,45,TUT5$
-	
-	If KeyHit(28) Then
-		text_var = text_var+1
-	EndIf
-	
-	
-	Case 2
-	
-	Text 10,30,TUT6$
-	Text 10,45,TUT7$
-	Text 10,60,TUT8$
-	
-	If KeyHit(28) Then
-		text_var = text_var+1
-	EndIf
-	
-	
-	Case 3
-	
-	Text 10,30,TUT9$
-	Text 10,45,TUT10$
-	Text 10,60,TUT11$
-	
-	If KeyHit(28) Then
-		text_var = text_var+1
-	EndIf
-	
-	Case 4
-	
-	Text 10,30,TUT12$
-	Text 10,45,TUT13$
-	Text 10,60,TUT14$
-	
-	If KeyHit(28) Then
-		text_var = text_var+1
-		player_move = 1
-	EndIf
-
-	;now he walks to the root
-	Case 5
-	tut = 1
+		Case 0 ; the first text
+			tut = 1
+			jumpAllow = 0 ; player is not able to jump
+			moveAny = 0
 		
-	For newitem.school = Each School
-	If ImagesCollide(root,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-	didCollide = 1
-	player_move = 0
-		Text 10,30,TUT15$
-		Text 10,45,TUT16$
-		Text 10,60,TUT17$
-		Text 10,75,TUT18$
-		Text 10,90,TUT19$
-
-	EndIf 
-	Next 
+			Text(10,30,tutText(0))
+			Text(10,45,tutText(1))
+			Text(10,60,tutText(2))
+			Text(10,75,tutText(3))
+			
+			If(KeyHit(28)) Then
+				;player_move = 1 ==> just after the last text
+				text_var = text_var+1
+			EndIf
+		Case 1
+			Text(10,30,tutText(4))
+			Text(10,45,tutText(5))
+			
+			If KeyHit(28) Then
+				text_var = text_var+1
+			EndIf
+		Case 2
+			Text(10,30,tutText(6))
+			Text(10,45,tutText(7))
+			Text(10,60,tutText(8))
+			
+			If KeyHit(28) Then
+				text_var = text_var+1
+			EndIf
+		Case 3
+			Text(10,30,tutText(9))
+			Text(10,45,tutText(10))
+			Text(10,60,tutText(11))
+			
+			If KeyHit(28) Then
+				text_var = text_var+1
+			EndIf
+		Case 4
+			Text(10,30,tutText(12))
+			Text(10,45,tutText(13))
+			Text(10,60,tutText(14))
+			
+			If KeyHit(28) Then
+				text_var = text_var+1
+				player_move = 1
+			EndIf
+		;now he walks to the root
+		Case 5
+			tut = 1
+			
+			Local newitem.School
+			For newitem.School = Each School
+				If(ImagesCollide(root,((newitem\School_x)-movX),((newitem\School_y)-movY),0,player,player_posx,player_posy,0)) Then
+				didCollide = 1
+				player_move = 0
+				Text(10,30,tutText(15))
+				Text(10,45,tutText(16))
+				Text(10,60,tutText(17))
+				Text(10,75,tutText(18))
+				Text(10,90,tutText(19))
+			EndIf 
+			Next 
+			
+			If(KeyHit(28) And didCollide) Then
+				text_var = text_var+1
+				player_move = 1
+				tut = 0
+				didCollide = 0
+			EndIf
 	
-	If KeyHit(28) And didCollide Then
-		text_var = text_var+1
-		player_move = 1
-		tut = 0
-		didCollide = 0
-	EndIf
-
-	;now he walks to the sandwich
-	Case 6
-	tut = 1
-	
-	For new_energy_object.energys = Each Energys
-	If ImagesCollide(sandwich,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY),0,player,player_posx,player_posy,0) Then
-	didCollide = 1
-	player_move = 0
-		Text 10,30,TUT20$
-		Text 10,45,TUT21$
-		Text 10,60,TUT22$
-		Text 10,75,TUT23$
- 	
-	EndIf	
-	Next
-	
-	If KeyHit(28) And didCollide Then
-		text_var = text_var+1
-		player_move = 1
-		tut = 0
-		didCollide = 0
-	EndIf
-	
-	
-	Case 7
-	tut = 1
-	
-	For new_less_energy_object.less_energys = Each Less_energys
-	If ImagesCollide(toilet,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY),0,player,player_posx,player_posy,0) Then
-	didCollide = 1
-	player_move = 0
-		Text 10,30,TUT24$
-		Text 10,45,TUT25$
-		Text 10,60,TUT26$
-		Text 10,75,TUT27$
- 	
-	EndIf	
-	Next
-
-	If KeyHit(28) And didCollide Then
-		text_var = text_var+1
-		tut = 0
-		didCollide = 0
-	EndIf
-	
-	
-	Case 8
-	tut = 1
-	
-	Text 10,30,TUT28$
-	Text 10,45,TUT29$
-	Text 10,60,TUT30$
-	Text 10,75,TUT31$
-	Text 10,90,TUT32$
-	
-	If KeyHit(28) Then
-	text_var = text_var+1
-	player_move = 1
-	tut = 0
-	moveAny = 1
-	EndIf 
-	
-	
-	Case 9
-	tut = 1
-
-	
-	If movX = 712 Then
-	didCollide = 1 		;this is a few metres behind the 1st monster
-	player_move = 0
-	moveAny = 0
-		Text 10,30,TUT33$
-		Text 10,45,TUT34$
-		Text 10,60,TUT35$
-	EndIf
-	
-	If KeyHit(28) And didCollide Then
-	text_var = text_var +1
-	player_move = 1
-	moveAny = 1
-	didCollide = 0
-	movX = 716 			; he must be placed behind the orig. pos. else he repeats it always!
-	EndIf  
-	
-	
-	Case 10
-	
-	If movX = 1012 Then		;this is a few metres behind the 2nd monster
-	didCollide = 1
-	player_move = 0
-		Text 10,30,TUT36$
-		Text 10,45,TUT37$
-		Text 10,60,TUT38$
-	EndIf
-	
-	If KeyHit(28) And didCollide Then
-	text_var = text_var +1
-	movX = 1016
-	didCollide = 0
-	EndIf
-	
-	
-	Case 11
-	
-	Text 10,30,TUT39$
-	Text 10,45,TUT40$
-	Text 10,60,TUT41$
-	
-	If KeyHit(28) Then
-	text_var = text_var+1
-	player_move = 1
-	didCollide = 0
-	jumpAllow = 1
-	EndIf 
-	
-	
-	Case 12
-	
-	If movX = 1664 Then 
-	player_move = 0
-	didCollide = 1
-	moveAny = 0
-	jumpAllow = 0
-	
-	Text 10,30,TUT42$
-	Text 10,45,TUT43$
-	EndIf 
-	
-	If KeyHit(28) And didCollide Then
-	text_var = text_var +1
-	player_move = 1
-	moveAny = 1
-	jumpAllow = 1
-	EndIf 
-
-
-
-	Case 13
-	For new_teacher.teacher = Each Teacher
-	If ImagesCollide(teacher,((New_teacher\pos_x)-movX),((New_teacher\pos_y)-movY),0,player,player_posx,player_posy,0) Then
-	doTrade = 0
-	moveAny = 0
-	jumpAllow = 0
-	didCollide = 1
-	player_move = 0
-		Text 10,30,TUT44$
-		Text 10,45,TUT45$
-		Text 10,60,TUT46$
-	EndIf
-	Next
-	
-	If KeyHit(28) And didCollide = 1 Then
-	doTrade = 1
-	text_var = text_var +1
-	EndIf
-	
-	
-	
-	Case 14
-	;in this case, the player is dealing with the teacher. If the deal is over, the Text_var is raised in the TeacherTrade-Function.
-	
-	
-	Case 15
-	player_move = 0
-	moveAny = 0
-	Text 10,30,TUT47$
-	Text 10,45,TUT48$
-	Text 10,60,TUT49$
-	
-	If KeyHit(28) Then
-	text_var = text_var+1
-	player_move = 1
-	didCollide = 0
-	moveAny = 1
-	jumpAllow = 1
-	doTrade = 0
-	EndIf 
-	
-	
-	Case 16
-	For new_sneak.sneak = Each Sneak
-	If ImagesCollide(sneak,((New_sneak\pos_x)-movX),((new_sneak\pos_y)-movY),0,player,player_posx,player_posy,0) Then
-	nextStep = 0 ; this is just for that the variable can be used
-	moveAny = 0
-	jumpAllow = 0
-	didCollide = 1
-	player_move = 0
-		Text 10,30,TUT50$
-		Text 10,45,TUT51$
-		Text 10,60,TUT52$
-		Text 10,75,TUT53$
-		Text 10,90,TUT54$
-	EndIf
-	Next
-	
-	If KeyHit(28) And didCollide Then
-	text_var = text_var +1
-	doTrade = 1
-	EndIf
-	
-	
-	Case 17
-	;see SneakTrade
-	
-	
-	Case 18
-	player_move = 0
-	moveAny = 0
-	Text 10,30,TUT55$
-	
-	If KeyHit(28) Then
-	player_move = 1
-	moveAny = 1
-	text_var = text_var +1 
-	jumpAllow = 1
-	EndIf 
-	
-	
-	Case 19
-	If movX = 2184 Then 
-	player_move = 0 
-		Text 10,30,TUT56$
-		Text 10,45,TUT57$
-		Text 10,60,TUT59$
-		Text 10,75,TUT60$
-	EndIf 
-	
-	If KeyHit(28) Then
-	player_move = 1
-	moveAny = 1
-	doTrade = 1
-	text_var = text_var +1 
-	score = 0
-	player_Energy = 100
-	EndIf 
-	
-End Select
+		;now he walks to the sandwich
+		Case 6
+			tut = 1
+			
+			For new_energy_object.energys = Each Energys
+				If(ImagesCollide(sandwich,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY),0,player,player_posx,player_posy,0)) Then
+					didCollide = 1
+					player_move = 0
+					Text(10,30,tutText(20))
+					Text(10,45,tutText(21))
+					Text(10,60,tutText(22))
+					Text(10,75,tutText(23))
+				EndIf	
+			Next
+			
+			If(KeyHit(28) And didCollide) Then
+				text_var = text_var+1
+				player_move = 1
+				tut = 0
+				didCollide = 0
+			EndIf
+		Case 7
+			tut = 1
+			
+			For new_less_energy_object.less_energys = Each Less_energys
+				If(ImagesCollide(toilet,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY),0,player,player_posx,player_posy,0)) Then
+					didCollide = 1
+					player_move = 0
+					Text(10,30,tutText(24))
+					Text(10,45,tutText(25))
+					Text(10,60,tutText(26))
+					Text(10,75,tutText(27))
+				EndIf	
+			Next
+			
+			If KeyHit(28) And didCollide Then
+				text_var = text_var+1
+				tut = 0
+				didCollide = 0
+			EndIf
+		Case 8
+			tut = 1
+			
+			Text(10,30,tutText(28))
+			Text(10,45,tutText(29))
+			Text(10,60,tutText(30))
+			Text(10,75,tutText(31))
+			Text(10,90,tutText(32))
+			
+			If(KeyHit(28)) Then
+				text_var = text_var+1
+				player_move = 1
+				tut = 0
+				moveAny = 1
+			EndIf
+		Case 9
+			tut = 1
+			
+			If(movX = 712) Then
+				didCollide = 1 		;this is a few metres behind the 1st monster
+				player_move = 0
+				moveAny = 0
+				Text(10,30,tutText(33))
+				Text(10,45,tutText(34))
+				Text(10,60,tutText(35))
+			EndIf
+			
+			If(KeyHit(28) And didCollide) Then
+				text_var = text_var +1
+				player_move = 1
+				moveAny = 1
+				didCollide = 0
+				movX = 716 			; he must be placed behind the orig. pos. else he repeats it always!
+			EndIf 
+		Case 10
+			If(movX = 1012) Then		;this is a few metres behind the 2nd monster
+				didCollide = 1
+				player_move = 0
+				Text(10,30,tutText(36))
+				Text(10,45,tutText(37))
+				Text(10,60,tutText(38))
+			EndIf
+			
+			If(KeyHit(28) And didCollide) Then
+				text_var = text_var +1
+				movX = 1016
+				didCollide = 0
+			EndIf
+		Case 11
+			Text(10,30,tutText(39))
+			Text(10,45,tutText(40))
+			Text(10,60,tutText(41))
+			
+			If(KeyHit(28)) Then
+				text_var = text_var+1
+				player_move = 1
+				didCollide = 0
+				jumpAllow = 1
+			EndIf 
+		Case 12
+			If(movX = 1664) Then 
+				player_move = 0
+				didCollide = 1
+				moveAny = 0
+				jumpAllow = 0
+				
+				Text(10,30,tutText(42))
+				Text(10,45,tutText(43))
+			EndIf 
+		
+			If KeyHit(28) And didCollide Then
+				text_var = text_var +1
+				player_move = 1
+				moveAny = 1
+				jumpAllow = 1
+			EndIf
+		Case 13
+			For new_teacher.teacher = Each Teacher
+				If(ImagesCollide(teacher,((New_teacher\pos_x)-movX),((New_teacher\pos_y)-movY),0,player,player_posx,player_posy,0)) Then
+					doTrade = 0
+					moveAny = 0
+					jumpAllow = 0
+					didCollide = 1
+					player_move = 0
+					Text(10,30,tutText(44))
+					Text(10,45,tutText(45))
+					Text(10,60,tutText(46))
+				EndIf
+			Next
+			
+			If(KeyHit(28) And didCollide) Then
+				doTrade = 1
+				text_var = text_var+1
+			EndIf
+		Case 14
+		;in this case, the player is dealing with the teacher. If the deal is over, the Text_var is raised in the TeacherTrade-Function.
+		Case 15
+			player_move = 0
+			moveAny = 0
+			Text(10,30,tutText(47))
+			Text(10,45,tutText(48))
+			Text(10,60,tutText(49))
+			
+			If(KeyHit(28)) Then
+				text_var = text_var+1
+				player_move = 1
+				didCollide = 0
+				moveAny = 1
+				jumpAllow = 1
+				doTrade = 0
+			EndIf 
+		Case 16
+			For new_sneak.sneak = Each Sneak
+				If(ImagesCollide(sneak,((New_sneak\pos_x)-movX),((new_sneak\pos_y)-movY),0,player,player_posx,player_posy,0)) Then
+					nextStep = 0 ; this is just for that the variable can be used
+					moveAny = 0
+					jumpAllow = 0
+					didCollide = 1
+					player_move = 0
+					Text(10,30,tutText(50))
+					Text(10,45,tutText(51))
+					Text(10,60,tutText(52))
+					Text(10,75,tutText(53))
+					Text(10,90,tutText(54))
+				EndIf
+			Next
+			
+			If(KeyHit(28) And didCollide) Then
+				text_var = text_var +1
+				doTrade = 1
+			EndIf
+		Case 17
+		;see SneakTrade
+		Case 18
+			player_move = 0
+			moveAny = 0
+			Text(10,30,tutText(55))
+			
+			If(KeyHit(28)) Then
+				player_move = 1
+				moveAny = 1
+				text_var = text_var+1 
+				jumpAllow = 1
+			EndIf 
+		Case 19
+			If(movX = 2184) Then 
+				player_move = 0
+				Text(10,30,tutText(56))
+				Text(10,45,tutText(57))
+				Text(10,60,tutText(59))
+				Text(10,75,tutText(60))
+			EndIf 
+			
+			If(KeyHit(28)) Then
+				player_move = 1
+				moveAny = 1
+				doTrade = 1
+				text_var = text_var +1 
+				score = 0
+				player_Energy = 100
+			EndIf 
+	End Select
 EndIf   
 
 End Function 
@@ -3117,68 +2918,49 @@ Function TextAbitur()
 		movY = 480
 	EndIf
 		
-	Text(0,0,ABI01$)
-	Text(0,15,ABI02$)
-	Text(0,30,ABI03$)
-	Text(0,45,ABI04$)
-	Text(0,60,ABI05$)
-	Text(0,75,ABI06$)
-	Text(0,90,ABI07$)
-	Text(0,105,ABI08$)
-	Text(0,120,ABI09$)
-	Text(0,135,ABI10$)
-	Text(0,150,ABI11$)
-	Text(0,165,ABI12$)
-	Text(0,180,ABI13$)
-	Text(0,195,ABI14$)
-	Text(0,210,ABI15$)
-	Text(0,225,ABI16$)
-	Text(0,240,ABI17$)
-	Text(0,255,ABI18$)
-	Text(0,270,ABI19$)
-	Text(0,285,ABI20$)
-	Text(0,300,ABI21$)
-	Text(0,315,ABI22$)
-	Text(0,330,ABI23$)
-	Text(0,345,ABI24$)
-	Text(0,360,ABI25$)
-	Text(0,375,ABI26$)
+	Text(0,0,abiText(0))
+	Text(0,15,abiText(1))
+	Text(0,30,abiText(2))
+	Text(0,45,abiText(3))
+	Text(0,60,abiText(4))
+	Text(0,75,abiText(5))
+	Text(0,90,abiText(6))
+	Text(0,105,abiText(7))
+	Text(0,120,abiText(8))
+	Text(0,135,abiText(9))
+	Text(0,150,abiText(10))
+	Text(0,165,abiText(11))
+	Text(0,180,abiText(12))
+	Text(0,195,abiText(13))
+	Text(0,210,abiText(14))
+	Text(0,225,abiText(15))
+	Text(0,240,abiText(16))
+	Text(0,255,abiText(17))
+	Text(0,270,abiText(18))
+	Text(0,285,abiText(19))
+	Text(0,300,abiText(20))
+	Text(0,315,abiText(21))
+	Text(0,330,abiText(22))
+	Text(0,345,abiText(23))
+	Text(0,360,abiText(24))
+	Text(0,375,abiText(25))
 		
 	If(KeyHit(28)) Then
 		level = level+1
 		doDrawPlayer = 1
-		xyz = 0
 		moveAny = 1
 		player_move = 1
 		lives = 3 ; for this level, player has 3 chances!
 		;delete old stuff from level tutorial
-		For newcoin.Coins = Each Coins
-			Delete newcoin.Coins
-		Next
-		For new_energy_object.energys = Each Energys
-			Delete New_energy_object.energys
-		Next
-		For newitem.school = Each School
-			Delete newitem.school
-		Next
-		For new_less_energy_object.less_energys = Each Less_energys
-			Delete new_less_energy_object.less_energys
-		Next
-		For new_monster.Monster = Each Monster
-			Delete new_monster.Monster
-		Next
-		For new_teacher.teacher = Each Teacher
-			Delete new_teacher.teacher
-		Next
-		For new_sneak.sneak = Each Sneak
-			Delete new_sneak.sneak
-		Next
-		For new_pause.pause = Each Pause
-			Delete new_pause.pause
-		Next
-		For newdoor.door = Each Door
-			Delete newdoor.door
-		Next 
+		Delete Each Coins
+		Delete Each Energys
+		Delete Each School
+		Delete Each Less_energys
+		Delete Each Monster
+		Delete Each Teacher
+		Delete Each Sneak
+		Delete Each Pause
+		Delete Each Door
 		ResumeChannel(backGround)
 	EndIf 
 End Function 
@@ -3253,11 +3035,10 @@ Function ShowMessages()
 	SetFont normFont ; change the font
 	Color 128,255,128 ; change font color 
 
-	If(message > 0)
-
+	If(message>0) Then
 		If(start_message=0) Then
 			start_message = 1
-			mathTime = MilliSecs() 
+			mathTime = MilliSecs()
 		EndIf 
 		Text(20,200,msg_Item$)
 		If(MilliSecs()-mathTime > 3000) Then
@@ -3265,173 +3046,12 @@ Function ShowMessages()
 			message = 0
 			start_message = 0
 		EndIf
-	
-		Select message
-			Case 1
-				msg_Item$ = "MATHEMATIK - Vereinfachung von Wurzelgleichungen"
-			Case 2
-				msg_Item$ = "MATHEMATIK - Kombinatorik und ungeordnete Entnahme von Stichproben"
-			Case 3
-				msg_Item$ = "MATHEMATIK - Integralrechnung und Kurvendiskussion"
-			Case 4
-				msg_Item$ = "MATHEMATIK - Kombinationen unter Berücksichtigung der der Elementanordnung"
-			Case 5
-				msg_Item$ = "MATHEMATIK - Fakultät"
-			Case 6
-				msg_Item$ = "MATHEMATIK - Bestimmte Integrale und deren Ober- und Untergrenzen"
-			Case 7
-				msg_Item$ = "MATHEMATIK - Vektorrechnung im zweidimensionalen karthesischen Koordinatensystem"
-			Case 8
-				msg_Item$ = "MATHEMATIK - Anstiegsberechnung über die erste Ableitung der Funktion"
-			Case 9
-				msg_Item$ = "MATHEMATIK - Verhalten einer Funktion im Unendlichen"
-			Case 10
-				msg_Item$ = "MATHEMATIK - Unter Schülern gebräuchliche Faustformeln sind eben nicht alles!"
-			Case 11
-				msg_Item$ = "ENGLISCH - 'Yes we can' => Politic of President Barack Obama in the USA"
-			Case 12
-				msg_Item$ = "ENGLISCH - Welsh tea traditions"
-			Case 13
-				msg_Item$ = "ENGLISCH - Be careful with your sentence structure: Keep in mind the SPO-rule!"
-			Case 14
-				msg_Item$ = "ENGLISCH - Symbolic flag of the United States of America"
-			Case 15
-				msg_Item$ = "GESCHICHTE - Die französische Revolution und der Aufstieg Napoleon Bonapartes"
-			Case 16
-				msg_Item$ = "GESCHICHTE - Die nationalsozialistische Diktatur 1933-1945 unter Adolf Hitler"
-			Case 17
-				msg_Item$ = "GESCHICHTE - Die DDR als Beispiel für einen demokratischen Diktaturstaat unter Führung Erich Honeckers"
-			Case 18
-				msg_Item$ = "GESCHICHTE - Die Zerstörung Karthagos als Folge des dritten punischen Krieges"
-			Case 19
-				msg_Item$ = "GESCHICHTE - Von der Märzrevolution bis zum Untergang der Weimarer Republik"
-			Case 20
-				msg_Item$ = "GESCHICHTE - Teilung Deutschlands in zwei unabhängige Staaten"
-			Case 21
-				msg_Item$ = "GESCHICHTE - Machterweiterung der Kommunisten durch Zusammenschluss der SPD und KPD zur 'Einheitspartei'"
-			Case 22
-				msg_Item$ = "DEUTSCH - Goethes Faust als Beispiel für eine Menschheitsparabel"
-			Case 23
-				msg_Item$ = "DEUTSCH - Schillers Don Karlos als Beispiel für dessen eigene Konventionen und Motive"
-			Case 24
-				msg_Item$ = "DEUTSCH - Lessings Nathan der Weise als Beispiel für Aufklärungsliteratur des 18. Jahrhunderts"
-			Case 25
-				msg_Item$ = "DEUTSCH - Reihungen von Haupt- und Nebensätzen im Vergleich"
-			Case 26
-				msg_Item$ = "DEUTSCH - Moderne Sprach- und Artikulationsmethoden in Jugendkreisen"
-			Case 27
-				msg_Item$ = "DEUTSCH - Der Duden als Meilenstein deutscher Sprachgeschichte"
-			Case 28
-				msg_Item$ = "SPORT - Gerätturnen am Parallelbarren"
-			Case 29
-				msg_Item$ = "SPORT - Armkrafttraining an Ringen"
-			Case 30
-				msg_Item$ = "SPORT - Badminton"
-			Case 31
-				msg_Item$ = "SPORT - Fußball"
-			Case 32
-				msg_Item$ = "SPORT - Leichtathletik"
-			Case 33
-				msg_Item$ = "SPORT - Kletterübungen an der Sprossenwand"
-			Case 34
-				msg_Item$ = "SPORT - Bocksprung"
-			Case 35
-				msg_Item$ = "SPORT - Bekanntgabe der drei Sieger"
-			Case 36
-				msg_Item$ = "GEOGRAFIE - Globale Disparitäten und Verflechtungen"
-			Case 37
-				msg_Item$ = "GEOGRAFIE - Anwendung der Informationen aus physischen Karten im Atlas"
-			Case 38
-				msg_Item$ = "GEOGRAFIE - Hoch- und Tiefdruckgebiete und deren Klimabeeinflussung"
-			Case 39
-				msg_Item$ = "GEOGRAFIE - Fair Trade (c) als globale Handelsorganisation, die sich für mehr Gerechtigkeit einsetzt"
-			Case 40
-				msg_Item$ = "GEOGRAFIE - Geysire und deren Bedeutung für Island"
-			Case 41
-				msg_Item$ = "GEOGRAFIE - Der Wasserhaushalt im Ökosystem Wald"
-			Case 42
-				msg_Item$ = "MUSIK - Wie sich das zwölftönige Notensystem in Europa durchgesetzt hat"
-			Case 43
-				msg_Item$ = "MUSIK - Instrumente in anderen Kulturen der Welt"
-			Case 44
-				msg_Item$ = "MUSIK - Entwicklung der Notationsform im Laufe der Musikgeschichte"
-			Case 45
-				msg_Item$ = "MUSIK - Elektrische Musik als neuartiges Phänomen des 20. Jahrhunderts"
-			Case 46
-				msg_Item$ = "MUSIK - Aufbau und Funktionsweise eines Klaviers"
-			Case 47
-				msg_Item$ = "MUSIK - Der Dirigent als leitendes Organ des Orchesters im Musiktheater"
-			Case 48
-				msg_Item$ = "MUSIK - Expressionistische Musik Arnold Schönbergs und deren Folgen für das menschliche Gehör"
-			Case 49
-				msg_Item$ = "MUSIK - Definition des Grundtons im Notensystem mithilfe des Notenschlüssels"
-			Case 50
-				msg_Item$ = "CHEMIE - Elektronenübertragung bei der Redox-Reaktion"
-			Case 51
-				msg_Item$ = "CHEMIE - Der Bunsenbrenner und dessen Strahlpumpen-Prinzip"
-			Case 52
-				msg_Item$ = "CHEMIE - Ammoniak und dessen Beeinträchtigung des Riechorgans bei Übergenuss"
-			Case 53
-				msg_Item$ = "CHEMIE - Explosive Reaktionen nur mit Schutzbrille durchführen!"
-			Case 54
-			  msg_Item$ = "CHEMIE - Das 'Zucker-Wasser-Salz'-Experiment und dessen Beliebtheit bei jungen Schülern"
-			Case 55
-				msg_Item$ = "CHEMIE - C4 als Beispiel für formbaren Plastiksprengstoff"
-			Case 56
-				msg_Item$ = "INFORMATIK - PlayRay (c), die von Schülern im Informatikunterricht der Oberstufe meistbesuchte Website"
-			Case 57
-				msg_Item$ = "INFORMATIK - Entwicklung sechsachsiger Joysticks zur Steuerung des Seitenruders in Flugsimulatoren"
-			Case 58
-				msg_Item$ = "INFORMATIK - Ablösung der VGA- und PS2-Stecker durch den vielseitig brauchbaren USB-Anschluss"
-			Case 59
-				msg_Item$ = "INFORMATIK - Entwicklung des World Wide Webs"
-			Case 60
-				msg_Item$ = "INFORMATIK - Google (c) verschafft sich die Weltherrschaft mit Satellitenüberwachung der Erde"
-			Case 61
-				msg_Item$ = "INFORMATIK - Peripheriegeräte und automatische Treibererkennung in Windows (r)"
-			Case 62
-				msg_Item$ = "ABITUR DEUTSCH - Mit dem Abiturwissen 2009 unter der Bank geht das Deutsch-Abi bestimmt nicht schief!"
-			Case 63
-				msg_Item$ = "ABITUR DEUTSCH - In Schillers Schädel hat schon Goethe seinerzeit geniale poetische Gedanken entdeckt..."
-			Case 64
-				msg_Item$ = "ABITUR DEUTSCH - Mit Mephisto an der Seite kannst du alles haben, was du willst - auch ein Deutsch-Abi!"
-			Case 68
-				msg_Item$ = "ABITUR ENGLISCH - Zweisprachige Wörterbücher sind ja leider verboten. Wer trotzdem eins hat, hat's besser!"
-			Case 69
-				msg_Item$ = "ABITUR ENGLISCH - Selbst Briten schwören auf 'German Bratwurst' - nimm einen Haps und schreibe gestärkt weiter!"
-			Case 70
-				msg_Item$ = "ABITUR ENGLISCH - Wie lautet die beliebte Schüler-Fluchformel? Richtig, 'Holy Shit'. Egal, Kopf hoch!"
-			Case 65
-				msg_Item$ = "ABITUR MATHEMATIK - Dieser Super-Taschenrechner spuckt dir die Nullstellen einer Gleichung 6. Grades in 0,02s aus!"
-			Case 66
-				msg_Item$ = "ABITUR MATHEMATIK - Stell dir vor, du hättest unendlich viel Ahnung... Mit diesem Symbol wird es möglich!"
-			Case 67
-				msg_Item$ = "ABITUR MATHEMATIK - Prof. Dr. Herbert Henning. Prima! Was der nicht kann, hat im Mathe-Abitur sowieso nichts zu suchen!"
-			Case 71
-				msg_Item$ = "ABITUR CHEMIE - Schreib einfach auf, dass ein Apfel Strom leitet. Vielleicht kriegst du ja 'n paar Punkte dafür..."
-			Case 72
-				msg_Item$ = "ABITUR CHEMIE - Kleiner Tipp: Das ist ein Gefahrensymbol nach Richtlinie 67/548/EWG der Gefahrenstoffverordnung :)."
-			Case 73
-				msg_Item$ = "ABITUR CHEMIE - Das ist ein ultimatives PSE mit über 3700 Elementen, die speziell fürs Abitur erfunden wurden..."
-			Case 74
-				msg_Item$ = "ABITUR GEOGRAFIE - Asien, Land der Sonne, der Russen und Chinesen, der Atomwaffen und des Ehrenmordes"
-			Case 75
-				msg_Item$ = "ABITUR GEOGRAFIE - Europa, Land der Vielfalt, der britischen Küche, der fehlenden Bildungspolitik und der Abwrackprämie."
-			Case 76
-				msg_Item$ = "ABITUR GEOGRAFIE - Nordamerika, erst Land Washingtons, dann Jeffersons, ..., dann der Bushs, heute Obamas Machtimperium."
-			Case 77
-				msg_Item$ = "ABITUR GEOGRAFIE - Südamerika, Land der Latinos, der Demokratur, des Hanfs und der korrupten Drogenbosse."
-			Case 78
-				msg_Item$ = "ABITUR GEOGRAFIE - Australien, komische Insel jwd, mit Wüste, Kängurus, Brandstiftern und sogar mit Warmwasser!"
-			Case 79
-				msg_Item$ = "ABITUR GEOGRAFIE - Afrika, Land des Kinderreichtums, des dreckigen Wassers und der fehlenden Infrastruktur."
-			Case 80
-				msg_Item$ = "ABITUR GEOGRAFIE - Antarktis, große Eisplatte, die (noch) nicht den USA gehört; wohl eine Fehlerschaffung Gottes."
-		End Select
+		
+		If(message>=1 And message<=80) Then msg_Item$ = itemText(message-1)
 	EndIf 
 End Function 
 
-; the cheat menu
+;the cheat menu
 Function Cheat()
 	If(KeyDown(29) And KeyDown(46)) Then
 		FlushKeys()
@@ -3448,69 +3068,37 @@ Function Cheat()
 			Case "Geld"
 				score = score+100
 			Case "Level+"
-				For newcoin.Coins = Each Coins
-					Delete newcoin.Coins
-				Next
-				For new_energy_object.energys = Each Energys
-					Delete New_energy_object.energys
-				Next
-				For newitem.school = Each School
-					Delete newitem.school
-				Next
-				For new_less_energy_object.less_energys = Each Less_energys
-					Delete new_less_energy_object.less_energys
-				Next
-				For new_monster.Monster = Each Monster
-					Delete new_monster.Monster
-				Next
-				For new_teacher.teacher = Each Teacher
-					Delete new_teacher.teacher
-				Next
-				For new_sneak.sneak = Each Sneak
-					Delete new_sneak.sneak
-				Next
-				For newdoor.door = Each Door
-					Delete newdoor.door
-				Next 
+				Delete Each Coins
+				Delete Each Energys
+				Delete Each School
+				Delete Each Less_energys
+				Delete Each Monster
+				Delete Each Teacher
+				Delete Each Sneak
+				Delete Each Door
 				player_move = 1
 				moveAny = 1
 				jumpAllow = 1
 				doTut = 0
 				tut = 0
 				player_Energy = 100
-				level = level +1
+				level = level+1
 			Case "Level-"
-				For newcoin.Coins = Each Coins
-					Delete newcoin.Coins
-				Next
-				For new_energy_object.energys = Each Energys
-					Delete New_energy_object.energys
-				Next
-				For newitem.school = Each School
-					Delete newitem.school
-				Next
-				For new_less_energy_object.less_energys = Each Less_energys
-					Delete new_less_energy_object.less_energys
-				Next
-				For new_monster.Monster = Each Monster
-					Delete new_monster.Monster
-				Next
-				For new_teacher.teacher = Each Teacher
-					Delete new_teacher.teacher
-				Next
-				For new_sneak.sneak = Each Sneak
-					Delete new_sneak.sneak
-				Next
-				For newdoor.door = Each Door
-					Delete newdoor.door
-				Next 
+				Delete Each Coins
+				Delete Each Energys
+				Delete Each School
+				Delete Each Less_energys
+				Delete Each Monster
+				Delete Each Teacher
+				Delete Each Sneak
+				Delete Each Door
 				player_move = 1
 				moveAny = 1
 				jumpAllow = 1
 				doTut = 0
 				tut = 0
 				player_Energy = 100
-				level = level -1
+				level = level-1
 		End Select
 		EndIf
 	EndIf 
@@ -3531,56 +3119,56 @@ End Function
 
 
 Function SaveGame()
-	If KeyHit(64) Then	;if F6 hit
-		If FileType("Save.dat")=1 Then
-		SaveData = OpenFile("Save.dat")
-		WriteInt(SaveData,level)
-		If start = 0 Then
-		WriteInt(SaveData,(start+1))
-		Else WriteInt(SaveData,(start-1))
-		EndIf 
-		WriteInt(SaveData,doTrade)
-		WriteInt(SaveData,nextStep)
-		WriteInt(SaveData,point)
-		WriteInt(SaveData,moveAny)
-		WriteInt(SaveData,PlayerMove)
-		WriteInt(SaveData,player_Energy)
-		WriteInt(SaveData,score)
-		WriteInt(SaveData,lives)
-		WriteInt(SaveData,creditPoints)
-		WriteInt(SaveData,pointMinimum)
-		WriteInt(SaveData,jumpAllow)
-		WriteInt(SaveData,tut)
-		WriteInt(SaveData,text_var)
-		WriteInt(SaveData,doTut)
-		WriteInt(SaveData,doDrawPlayer)
-		WriteInt(SaveData,movX)
-		WriteInt(SaveData,movY)
+	If(KeyHit(64)) Then	;if F6 hit
+		If(FileType("Save.dat")=1) Then
+			SaveData = OpenFile("Save.dat")
+			WriteInt(SaveData,level)
+			If(start = 0) Then
+				WriteInt(SaveData,(start+1))
+			Else 
+				WriteInt(SaveData,(start-1))
+			EndIf
+			WriteInt(SaveData,doTrade)
+			WriteInt(SaveData,nextStep)
+			WriteInt(SaveData,point)
+			WriteInt(SaveData,moveAny)
+			WriteInt(SaveData,PlayerMove)
+			WriteInt(SaveData,player_Energy)
+			WriteInt(SaveData,score)
+			WriteInt(SaveData,lives)
+			WriteInt(SaveData,creditPoints)
+			WriteInt(SaveData,pointMinimum)
+			WriteInt(SaveData,jumpAllow)
+			WriteInt(SaveData,tut)
+			WriteInt(SaveData,text_var)
+			WriteInt(SaveData,doTut)
+			WriteInt(SaveData,doDrawPlayer)
+			WriteInt(SaveData,movX)
+			WriteInt(SaveData,movY)
 		CloseFile(SaveData)
 
 		Else
-		SaveData = WriteFile("Save.dat")
-		WriteInt(SaveData,level)
-		WriteInt(SaveData,start)
-		WriteInt(SaveData,doTrade)
-		WriteInt(SaveData,nextStep)
-		WriteInt(SaveData,point)
-		WriteInt(SaveData,moveAny)
-		WriteInt(SaveData,PlayerMove)
-		WriteInt(SaveData,player_Energy)
-		WriteInt(SaveData,score)
-		WriteInt(SaveData,lives)
-		WriteInt(SaveData,creditPoints)
-		WriteInt(SaveData,pointMinimum)
-		WriteInt(SaveData,jumpAllow)
-		WriteInt(SaveData,tut)
-		WriteInt(SaveData,text_var)
-		WriteInt(SaveData,doTut)
-		WriteInt(SaveData,doDrawPlayer)
-		WriteInt(SaveData,movX)
-		WriteInt(SaveData,movY)
-		CloseFile(SaveData)
-
+			SaveData = WriteFile("Save.dat")
+			WriteInt(SaveData,level)
+			WriteInt(SaveData,start)
+			WriteInt(SaveData,doTrade)
+			WriteInt(SaveData,nextStep)
+			WriteInt(SaveData,point)
+			WriteInt(SaveData,moveAny)
+			WriteInt(SaveData,PlayerMove)
+			WriteInt(SaveData,player_Energy)
+			WriteInt(SaveData,score)
+			WriteInt(SaveData,lives)
+			WriteInt(SaveData,creditPoints)
+			WriteInt(SaveData,pointMinimum)
+			WriteInt(SaveData,jumpAllow)
+			WriteInt(SaveData,tut)
+			WriteInt(SaveData,text_var)
+			WriteInt(SaveData,doTut)
+			WriteInt(SaveData,doDrawPlayer)
+			WriteInt(SaveData,movX)
+			WriteInt(SaveData,movY)
+			CloseFile(SaveData)
 		EndIf
 	EndIf 
 End Function
@@ -3622,7 +3210,7 @@ Type Image
 	Field animated
 End Type
 
-; Type for the Coin:
+;Type for the Coin:
 Type Coins
 	Field Coinx
 	Field Coiny
@@ -3703,681 +3291,8 @@ Type Pause
 	Field pos_x
 	Field pos_y
 	Field sort
-End Type  
-
-;data fields
-.CoinLevel2
-Data 35
-Data 5375,698,1
-Data 5343,634,2
-Data 4315,698,1
-Data 5343,698,2
-Data 5155,570,1
-Data 5123,570,1
-Data 5059,570,1
-Data 5027,570,1
-Data 4903,570,3
-Data 4803,570,2
-Data 4803,602,2
-Data 4803,634,2
-Data 4803,666,2
-Data 4735,506,3
-Data 5183,122,4
-Data 4555,442,3
-Data 4327,442,3
-Data 4479,451,2
-Data 4479,419,2
-Data 4479,387,2
-Data 4223,666,1
-Data 4035,602,3
-Data 3623,570,2
-Data 3527,666,4
-Data 3239,538,2
-Data 3199,250,4
-Data 2979,634,1
-Data 2787,666,3
-Data 3039,506,3
-Data 3167,666,2
-Data 3235,666,1
-Data 2439,602,3
-Data 2307,666,2
-Data 2271,282,2
-Data 1919,314,2
-
-.CoinLevel3
-Data 52
-Data 31,250,1
-Data 35,410,2
-Data 259,378,2
-Data 259,346,2
-Data 259,314,2
-Data 259,282,2
-Data 259,442,3
-Data 25,666,2
-Data 255,602,3
-Data 447,602,3
-Data 383,602,3
-Data 639,378,2
-Data 391,218,1
-Data 359,282,2
-Data 323,346,3
-Data 607,602,2
-Data 1063,570,3
-Data 991,570,1
-Data 991,538,2
-Data 1239,666,2
-Data 1387,666,3
-Data 1571,666,3
-Data 1699,570,3
-Data 1607,506,3
-Data 1443,410,5
-Data 2051,666,1
-Data 2083,666,1
-Data 2115,666,1
-Data 2147,666,1
-Data 2179,666,1
-Data 2211,666,1
-Data 2275,634,2
-Data 2171,474,2
-Data 1927,410,1
-Data 1895,346,2
-Data 1859,282,3
-Data 2399,90,4
-Data 2751,602,1
-Data 2824,442,2
-Data 2911,410,3
-Data 3007,570,2
-Data 3207,602,1
-Data 3147,442,2
-Data 3111,346,3
-Data 3459,634,2
-Data 3555,634,3
-Data 3683,634,1
-Data 3715,634,1
-Data 3747,634,1
-Data 3935,602,3
-Data 3843,570,2
-Data 4415,378,5
-
-.CoinLevel4
-Data 15
-Data 5663,698,1
-Data 5639,634,2
-Data 5599,570,3
-Data 5215,314,3
-Data 5151,666,1
-Data 5119,634,1
-Data 5087,602,1
-Data 5055,570,2
-Data 4835,378,3
-Data 4931,346,3
-Data 5155,218,4
-Data 4255,506,3
-Data 4223,474,3
-Data 4191,442,3
-Data 4159,410,5
-
-.EnergyLevel2
-Data 7
-Data 4791,447,1
-Data 5123,639,1
-Data 4351,671,2
-Data 4223,575,1
-Data 3491,255,1
-Data 2651,543,2
-Data 2531,735,1
-
-.EnergyLevel3
-Data 13
-Data 31,351,1
-Data 355,351,1
-Data 767,543,1
-Data 1275,511,1
-Data 1339,511,1
-Data 1535,511,1
-Data 1635,575,2
-Data 2083,447,1
-Data 1951,127,1
-Data 2975,351,1
-Data 2975,383,1
-Data 2975,415,1
-Data 3795,575,2
-
-.EnergyLevel4
-Data 2
-Data 5247,319,2
-Data 5279,319,2
-
-.EnergyLevelAbi1 ;3=Energy Drop
-Data 14
-Data 1311,447,3
-Data 1279,639,3
-Data 895,703,3
-Data 1701,639,3
-Data 2015,575,3
-Data 2137,607,3
-Data 2685,671,2
-Data 2719,319,3
-Data 3427,735,3
-Data 3395,735,3
-Data 3427,703,2
-Data 3459,415,3
-Data 4191,287,3
-Data 4251,639,3
-
-.EnergyLevelAbi2
-Data 5
-Data 65,223,3
-Data 33,223,2
-Data 931,223,3
-Data 39,735,3
-Data 769,479,3
-
-.GermanItemsLevel2
-Data 6
-Data 5635,703,22
-Data 5375,383,23
-Data 4891,447,24
-Data 5155,639,25
-Data 4423,479,26
-Data 4039,543,27
-
-.SportItemsLevel2
-Data 8
-Data 3843,735,28
-Data 3423,671,29
-Data 3583,223,30
-Data 2979,543,31
-Data 3363,671,32
-Data 3203,575,33
-Data 2835,639,34
-Data 2559,607,35
-
-.GeoItemsLevel2
-Data 6
-Data 2371,639,36
-Data 2335,447,37
-Data 2083,415,38
-Data 2019,159,39
-Data 1951,735,40
-Data 1823,479,41
-
-.MusicItemsLevel3
-Data 8
-Data 59,255,42
-Data 31,575,43
-Data 511,479,44
-Data 487,351,45
-Data 439,159,46
-Data 1059,543,47
-Data 863,383,48
-Data 1439,607,49
-
-.ChemItemsLevel3
-Data 6
-Data 2111,127,50
-Data 2147,447,51
-Data 2211,447,52
-Data 2127,607,53
-Data 2463,543,54
-Data 2567,735,55
-
-.CompScienceItemsLevel3
-Data 6
-Data 3071,383,56
-Data 2963,671,57
-Data 3967,639,58
-Data 4287,607,59
-Data 4547,287,60
-Data 3075,319,61
-
-.ItemsLevel4
-Data 9
-Data 5411,511,6
-Data 5379,671,27
-Data 5251,447,55
-Data 5155,319,12
-Data 5023,639,42
-Data 4871,479,20
-Data 4595,639,30
-Data 4323,575,36
-Data 3971,511,61
-
-.ItemsLevelAbi1
-Data 12
-Data 63,159,62
-Data 1183,447,63
-Data 1315,703,64
-Data 1791,639,65
-Data 1965,543,66
-Data 2339,639,67
-Data 2691,415,68
-Data 3011,479,69
-Data 3135,383,70
-Data 4159,255,71
-Data 4035,703,72
-Data 4640,639,73
-
-.ItemsLevelAbi2
-Data 7
-Data 479,735,80
-Data 193,607,77
-Data 351,319,76
-Data 479,287,75
-Data 479,415,79
-Data 647,543,78
-Data 671,351,74
-
-.LessEnergyLevel2 ;sort: 1-Toilet, 2-Food, 3-Ashtray
-Data 8
-Data 5407,735,1
-Data 5247,383,1
-Data 4747,447,1
-Data 5095,575,1
-Data 3139,575,1
-Data 2523,575,1
-Data 2275,575,1
-Data 2257,735,1
-
-.LessEnergyLevel3
-Data 27
-Data 68,735,1
-Data 291,735,2
-Data 383,735,1
-Data 447,735,1
-Data 383,479,1
-Data 575,223,2
-Data 1023,479,1
-Data 1223,607,1
-Data 1255,607,1
-Data 1287,607,1
-Data 1319,607,1
-Data 1351,607,1
-Data 1383,607,1
-Data 1415,607,1
-Data 1479,607,1
-Data 1537,607,1
-Data 2239,543,1
-Data 2047,511,2
-Data 2147,511,2
-Data 2399,191,2
-Data 2431,191,2
-Data 2431,447,1
-Data 2495,447,2
-Data 1723,671,2
-Data 3167,543,1
-Data 3267,735,2
-Data 2911,447,1
-
-.LessEnergyLevel4
-Data 9
-Data 5567,607,3
-Data 5375,415,1
-Data 5347,607,2
-Data 5031,703,3
-Data 5123,255,1
-Data 4758,575,1
-Data 4726,607,1
-Data 4703,639,1
-Data 4547,639,3
-
-.LessEnergyLevelAbi1
-Data 50
-Data 579,607,2
-Data 611,575,1
-Data 793,543,2
-Data 513,415,1
-Data 769,671,2
-Data 736,639,2
-Data 927,447,1
-Data 1055,447,1
-Data 1315,735,3
-Data 1283,735,3
-Data 1251,735,3
-Data 1187,735,3
-Data 1155,735,3
-Data 1123,735,3
-Data 1091,735,3
-Data 1059,735,3
-Data 1027,735,3
-Data 1599,735,3
-Data 1599,671,3
-Data 1599,607,3
-Data 1727,575,1
-Data 1759,639,2
-Data 1923,575,2
-Data 2049,735,1
-Data 2079,735,3
-Data 2243,607,1
-Data 2307,703,1
-Data 2367,575,3
-Data 2399,575,3
-Data 2362,671,1
-Data 2362,639,1
-Data 2623,575,2
-Data 2919,383,2
-Data 2979,543,2
-Data 3011,543,2
-Data 3043,543,2
-Data 2979,575,1
-Data 3011,575,1
-Data 3042,575,1
-Data 2947,607,1
-Data 3011,607,1
-Data 3075,607,1
-Data 3139,319,1
-Data 3203,255,3
-Data 3263,191,2
-Data 3647,511,3
-Data 4097,319,1
-Data 4097,287,1
-Data 3839,735,1
-Data 4127,735,2
-
-.LessEnergyLevelAbi2
-Data 17
-Data 193,223,2
-Data 643,703,1
-Data 611,703,1
-Data 579,703,1
-Data 227,639,3
-Data 259,639,1
-Data 259,607,1
-Data 319,319,1
-Data 383,319,1
-Data 479,351,3
-Data 479,447,3
-Data 479,479,3
-Data 479,511,3
-Data 615,511,2
-Data 647,511,2
-Data 679,511,2
-Data 705,415,3
-
-.MonsterLevel2
-Data 10
-Data 1,5547,639,1,8,1,5547,100
-Data 1,5155,223,1,8,1,5155,100
-Data 1,5219,223,1,8,1,5219,100
-Data 1,5043,735,1,8,1,5043,100
-Data 1,4419,735,1,8,1,4419,100
-Data 2,4039,735,1,8,1,4039,100
-Data 2,3459,735,1,8,1,3459,100
-Data 1,3587,735,1,8,1,3587,100
-Data 1,3407,255,1,8,1,3407,100
-Data 1,2131,511,1,8,1,2131,100
-
-.MonsterLevel3
-Data 16
-Data 1,91,479,1,8,1,91,100
-Data 2,395,735,1,8,1,395,100
-Data 3,747,383,1,8,1,747,100
-Data 1,1223,671,1,8,1,1223,100
-Data 1,1351,671,1,8,1,1351,100
-Data 2,1479,671,1,8,1,1479,100
-Data 3,1607,671,1,8,1,1607,100
-Data 1,1643,447,1,8,1,1643,100
-Data 1,2127,607,1,8,1,2127,100
-Data 3,2019,191,1,8,1,2019,100
-Data 1,2395,735,1,8,1,2395,100
-Data 1,2587,735,1,8,1,2587,100
-Data 2,3763,511,1,8,1,3763,100
-Data 2,4075,639,1,8,1,4075,100
-Data 1,3967,703,1,8,1,3967,100
-Data 1,4403,479,1,8,1,4403,100
-
-.MonsterLevel4
-Data 13
-Data 1,5423,735,1,8,1,5423,100
-Data 1,5487,735,1,8,1,5487,100
-Data 1,5551,735,1,8,1,5551,100
-Data 3,5491,511,1,8,1,5491,100
-Data 2,5211,735,1,8,1,5211,100
-Data 2,5139,415,1,8,1,5139,100
-Data 3,4899,479,1,8,1,4899,100
-Data 1,5055,319,1,8,1,5055,100
-Data 1,4515,735,1,8,1,4515,100
-Data 3,4403,575,1,8,1,4403,100
-Data 1,3739,735,1,8,1,3739,100
-Data 3,3547,735,1,8,1,3547,100
-Data 2,3643,735,1,8,1,3643,100
-
-.MonsterLevelAbi1
-Data 35
-Data 1,155,735,1,8,1,155,100
-Data 3,407,639,1,8,1,407,100
-Data 1,407,639,1,8,1,407,100
-Data 3,761,543,1,8,1,761,100
-Data 4,363,351,1,8,1,761,100
-Data 4,215,351,1,8,1,215,100
-Data 2,748,735,1,8,1,748,100
-Data 3,1023,287,1,8,1,1023,100
-Data 3,1235,639,1,8,1,1235,100
-Data 3,1647,735,1,8,1,1647,100
-Data 3,1823,735,1,8,1,1823,100
-Data 4,1989,639,1,8,1,1989,100
-Data 1,2123,735,1,8,1,2123,100
-Data 1,2155,735,1,8,1,2155,100
-Data 1,2187,735,1,8,1,2187,100
-Data 4,2653,671,1,8,1,2653,100
-Data 1,2643,415,1,8,1,2643,100
-Data 4,2783,383,1,8,1,2783,100
-Data 1,2831,671,1,8,1,2831,100
-Data 3,2759,735,1,8,1,2759,100
-Data 4,3263,735,1,8,1,3263,100
-Data 4,3335,543,1,8,1,3335,100
-Data 3,3203,383,1,8,1,3203,100
-Data 4,3375,415,1,8,1,3375,100
-Data 4,3527,735,1,8,1,3527,100
-Data 4,3655,735,1,8,1,3655,100
-Data 3,3829,543,1,8,1,3829,100
-Data 1,4093,511,1,8,1,4093,100
-Data 1,4157,511,1,8,1,4157,100
-Data 3,4247,575,1,8,1,4247,100
-Data 3,4151,575,1,8,1,4151,100
-Data 4,3931,735,1,8,1,3931,100
-Data 4,4519,287,1,8,1,4519,100
-Data 4,4647,287,1,8,1,4647,100
-Data 3,4679,287,1,8,1,4679,100
-
-.MonsterLevelAbi2
-Data 7
-Data 3,859,223,1,8,1,859,100
-Data 4,479,735,1,8,1,479,100
-Data 4,479,735,1,8,1,479,100
-Data 1,207,735,1,8,1,207,100
-Data 1,107,735,1,8,1,107,100
-Data 3,231,479,1,8,1,231,100
-Data 4,483,607,1,8,1,483,100
-
-.PauseAbi1 ; 1=8th, 2=4th
-Data 7
-Data 287,639,1
-Data 991,575,2
-Data 2157,671,1
-Data 2751,575,2
-Data 3427,543,1
-Data 4159,223,2
-Data 4035,735,1
-
-.PauseAbi2
-Data 1
-Data 163,479,2
-
-.TeacherLevel2
-Data 2
-Data 3483,607,0,1,1,3483
-Data 1767,735,0,1,1,1767
-
-.TeacherLevel3
-Data 2
-Data 1883,735,0,1,1,1883
-Data 3451,575,0,1,1,3451
-
-.TeacherLevel4
-Data 1
-Data 4083,415,0,1,1,4083
-
-.SneakLevel2
-Data 1
-Data 3087,735,0,1,1,3087
-
-.SneakLevel3
-Data 2
-Data 2867,735,0,1,1,2867
-Data 4491,319,0,1,1,4491
-
-.DoorLevel2
-Data 1603,735,1
-
-.DoorLevel3
-Data 4515,735,1
-
-.DoorLevel4
-Data 3423,735,1
-
-.DoorLevelAbi1
-Data 4707,287,1
-
-.DoorLevelAbi2
-Data 647,383,1
-
-
-.BrickLevel2
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,1,1,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,1,1,1,0,1,1,1,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1
-Data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-.BrickLevel3
-Data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,0,1,1,0,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,1,1,1,0,0,1,1,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-.BrickLevel4
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1
-Data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-.BrickLevelAbi2
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-
-.BrickLevelAbi1
-Data 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,0,0,0,0,1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,1,1,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,1,0,0,1,0,0,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,1,1,1,0,0,0,0,1,0,0,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
-Data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+End Type
 ;~IDEal Editor Parameters:
-;~F#216#21E#227#238#25D#267#275#28E#336#56F#57D#598#5A3#721#743#74A#774#7D9#7E0#80B
-;~F#850#85B#86A#883#892#8D8#9E6#A3E#A97#ADB#C28#C71#C7B
+;~F#1C4#1CD#1DF#1E7#1F0#201#226#230#23E#257#2FF#538#546#561#56C#5FE#6EA#70C#713#73D
+;~F#7A2#7A9#7D4#819#824#833#84C#85B#8A1#8D8#A00#A43#B61#B97#BA1#BAD#BD9#C23#C68
 ;~C#Blitz3D
