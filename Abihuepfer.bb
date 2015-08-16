@@ -1,4 +1,4 @@
-AppTitle("Abi-Huepfer 1.1") ; Title of the game and version
+AppTitle("Abi-Huepfer 1.2") ; Title of the game and version
 
 ; Graphics, Buffer and Random generator
 Global screenWidth = 1024
@@ -31,9 +31,9 @@ Global stream
 ; all non-moving graphics
 Global coin = LoadImage("gfx/1Coin.bmp")			; 1 coin
 MaskImage(coin, 255, 0, 255)
-Global coin_5 = LoadImage("gfx/5Coin.bmp")			; 5 coins
+Global coin_5 = LoadImage("gfx/5Coin.bmp")			; 5 Coin
 MaskImage(coin_5, 255, 0, 255)
-Global coin_10 = LoadImage("gfx/10Coin.bmp")		; 10 coins
+Global coin_10 = LoadImage("gfx/10Coin.bmp")		; 10 Coin
 MaskImage(coin_10, 255, 0, 255)
 Global purse = LoadImage("gfx/Purse.bmp")			; Purse
 MaskImage(purse, 255, 0, 255)
@@ -241,10 +241,10 @@ Global antarctica = LoadImage("gfx/Antarctica.bmp")	; antarctica card
 MaskImage(antarctica, 255, 0, 255)
 
 ;breaks
-Global quarterpause = LoadImage("gfx/Quarterpause.bmp")	; quarter minute break
-MaskImage(quarterpause, 255, 0, 255)
-Global eighthpause = LoadImage("gfx/Eighthpause.bmp")	; eighth minute break
-MaskImage(eighthpause, 255, 0, 255)
+Global crotchetRest = LoadImage("gfx/CrotchetRest.bmp")	; 15 sec break
+MaskImage(crotchetRest, 255, 0, 255)
+Global eighthRest = LoadImage("gfx/EighthRest.bmp")	; 7.5 sec break
+MaskImage(eighthRest, 255, 0, 255)
 
 
 ;player, teacher and sneak
@@ -267,8 +267,8 @@ MaskImage(monsterZero, 255, 0, 255)
 
 
 ;dimensionate the surface for the bricks
-Dim actualLevel(182,25)
-Global brickx, bricky ; coordinates of the bricks
+Dim currentLevel(182,25)
+Global brickX, brickY ; coordinates of the bricks
 
 
 ;in the Trade Function
@@ -291,13 +291,13 @@ Global monster_Frametime
 Global m_lazy_frame, m_naughty_frame, m_zero_frame, m_honk_frame
 Global m_lazy_time, m_naughty_time, m_zero_time, m_honk_time
 Global m_lazy_move, m_naughty_move, m_zero_move, m_honk_move
-Global new_monster.Monster ; to use this var in other functions too
+Global newMonster.Monster ; to use this var in other functions too
 
 ;general variables
 Global moveAny = 1 ; all other objects moving
-Global player_move = 0 ; the player moving
-Global player_Energy = 50 ; player energy
-Global score = 0	; player score in coins
+Global playerMove = 0 ; the player moving
+Global playerEnergy = 50 ; player energy
+Global score = 0	; player score in Coin
 Global lives = 5	; number of lives
 Global creditPoints ; ... and credit points
 Global pointMinimum ; the minimum of points to finish the level
@@ -305,7 +305,7 @@ Global pointMinimum ; the minimum of points to finish the level
 ;variables for the jump function
 Global jump
 Global gravity
-Global posy_temp
+Global posYTemp
 Global jumpAllow = 1
 
 ;variables for the tutorial
@@ -315,8 +315,8 @@ Global doTut = 1 ; start with the tutorial? (1=yes, 0=no)
 
 ;player specific variables
 Global doDrawPlayer = 1  ; shall the program draw the player?
-Global player_posx = (screenWidth/2) ; \ positioned in the middle of the screen
-Global player_posy = (screenHeight/2) ; /
+Global playerPosX = (screenWidth/2) ; \ positioned in the middle of the screen
+Global playerPosY = (screenHeight/2) ; /
 Global frame = 0		 ; the frame 
 Global time = 0			 ; checks when a frame has to be changed
 Global movingRight ; whether he moves in right or left direction
@@ -337,8 +337,8 @@ Global msg_Item$ ;variable shows the message for each item
 Global message
 Global start_message = 0 
 
-;to control the pauses in the Abi-Levels
-Global pauseTime
+;to control the Rests in the Abi-Levels
+Global restTime
 Global timeValue
 
 ;the sounds
@@ -353,7 +353,7 @@ Global levelAgain = LoadSound("sfx/LevelAgain.wav")	  ; when restarting a level
 Global backGround = PlayMusic("sfx/Jumpin' in the School.mid") ; background melody
 ChannelVolume(backGround,0.33)
 
-;the following constants include the text for the tutorial-level
+;texts for the tutorial level
 Dim tutText$(60)
 stream = ReadFile("txt/tutorial.txt")
 Local i
@@ -362,7 +362,7 @@ For i=0 To 60
 Next
 CloseFile(stream)
 
-; these constants show the text for the Abi-message
+;texts for the Abitur message
 Dim abiText(32)
 stream = ReadFile("txt/abitur.txt")
 For i=0 To 32
@@ -375,6 +375,14 @@ Dim itemText(79)
 stream = ReadFile("txt/items.txt")
 For i=0 To 79
 	itemText(i) = ReadLine(stream)
+Next
+CloseFile(stream)
+
+;trade texts
+Dim tradeText(13)
+stream = ReadFile("txt/trade.txt")
+For i=0 To 13
+	tradeText(i) = ReadLine(stream)
 Next
 CloseFile(stream)
 
@@ -428,8 +436,8 @@ Repeat
 	DrawSneak()
 	MoveSneak()
 	SneakTrade()
-	DrawPause()
-	PauseCollision()
+	DrawRest()
+	RestCollision()
 	PlayerJump()
 	PlayerShoot()
 	DrawShoot()
@@ -452,32 +460,31 @@ End()
 ;draws the player and checks his lives and energy
 Function DrawPlayer()
 	If(doDrawPlayer=1) Then
-		DrawImage player, player_posx, player_posy, frame
+		DrawImage(player,playerPosX,playerPosY,frame)
 	EndIf 
-	If(player_Energy>100) Then player_Energy = 100 ; no more than 100% energy
+	If(playerEnergy>100) Then playerEnergy = 100 ; no more than 100% energy
 	If(creditPoints<0) Then creditPoints = 0 ; no less than 0 points
 End Function
 
-
 Function MovePlayer()
-	If(player_move <> 0) Then
+	If(playerMove <> 0) Then
 		If(KeyDown(205)) Then 
-			Anim_Player_Right() ; animates the player
+			AnimPlayerRight() ; animates the player
 			movingRight = 1
-			If(actualLevel((player_posx+32+movX)/32, (player_posy+movY)/32)=0) Then
+			If(currentLevel((playerPosX+32+movX)/32, (playerPosY+movY)/32)=0) Then
 				movX = movX+4 ;Right
 			EndIf
 		ElseIf(KeyDown(203)) Then 
-			Anim_Player_Left()
+			AnimPlayerLeft()
 			movingRight = 0
-			If(actualLevel((player_posx+movX)/32, (player_posy+movY)/32)=0) Then
+			If(currentLevel((playerPosX+movX)/32, (playerPosY+movY)/32)=0) Then
 				movX = movX-4 ;Left
 			EndIf
 		EndIf
 	EndIf 
 End Function
 
-Function Anim_Player_Right()
+Function AnimPlayerRight()
 	If(MilliSecs()-time>150) Then
 		time = MilliSecs()
 		frame = frame+1
@@ -485,7 +492,7 @@ Function Anim_Player_Right()
 	If(frame>3) Then frame = 0
 End Function
 
-Function Anim_Player_Left()
+Function AnimPlayerLeft()
 	If(frame<4) Then frame = 4
 	If(MilliSecs()-time>150) Then
 		time = MilliSecs()
@@ -495,52 +502,53 @@ Function Anim_Player_Left()
 End Function
 
 Function DrawCoin()
-	Local newcoin.Coins
-	For newcoin.Coins = Each Coins
-		If(newcoin\Sort=1) Then ;ask which coin it is (1,5,10,50-euro or credit card)
-			DrawImage coin, ((newcoin\Coinx)-movX), ((newcoin\Coiny)-movY)
-		ElseIf(newcoin\Sort=2) Then
-			DrawImage coin_5, ((newcoin\Coinx)-movX), ((newcoin\Coiny)-movY)
-		ElseIf newcoin\Sort = 3 Then
-			DrawImage coin_10, ((newcoin\Coinx)-movX), ((newcoin\Coiny)-movY)
-		ElseIf newcoin\Sort = 4 Then
-			DrawImage purse,((newcoin\Coinx)-movX),((newcoin\Coiny)-movY)
-		ElseIf newcoin\Sort = 5 Then
-			DrawImage creditcard,((newcoin\Coinx)-movX),((newcoin\Coiny)-movY)
+	Local newCoin.Coin
+	For newCoin.Coin = Each Coin
+		If(newCoin\sort=1) Then ;ask which coin it is (1,5,10,50-euro or credit card)
+			DrawImage(coin, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY))
+		ElseIf(newCoin\sort=2) Then
+			DrawImage(coin_5, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY))
+		ElseIf newCoin\sort = 3 Then
+			DrawImage(coin_10, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY))
+		ElseIf newCoin\sort = 4 Then
+			DrawImage(purse,((newCoin\coinX)-movX),((newCoin\coinY)-movY))
+		ElseIf newCoin\sort = 5 Then
+			DrawImage(creditcard,((newCoin\coinX)-movX),((newCoin\coinY)-movY))
 		EndIf 
 	Next
 End Function
 
 Function CoinCollision()
-	For newcoin.Coins = Each Coins
-		Select(newcoin\sort)
+	Local newCoin.Coin
+	For newCoin.Coin = Each Coin
+		Select(newCoin\sort)
 		Case 1
-		If ImagesCollide (coin, ((newcoin\coinx)-movX), ((newcoin\coiny)-movY), 0, player, player_posx, player_posy, frame) Then
-			Delete newcoin.Coins
-			PlaySound coinCollect
-			score = score + 1
-		EndIf	
+			If(ImagesCollide (coin, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY), 0, player, playerPosX, playerPosY, frame)) Then
+				Delete newCoin.Coin
+				PlaySound coinCollect
+				score = score + 1
+			EndIf	
 		Case 2
-		If ImagesCollide (coin_5, ((newcoin\coinx)-movX), ((newcoin\coiny)-movY), 0, player, player_posx, player_posy, frame) Then
-			Delete newcoin.Coins
+			If ImagesCollide (coin_5, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY), 0, player, playerPosX, playerPosY, frame) Then
+				Delete newCoin.Coin
 			PlaySound coinCollect
 			score = score + 5
 		EndIf		
 		Case 3
-		If ImagesCollide (coin_10, ((newcoin\coinx)-movX), ((newcoin\coiny)-movY), 0, player, player_posx, player_posy, frame) Then
-			Delete newcoin.Coins
+			If ImagesCollide (coin_10, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY), 0, player, playerPosX, playerPosY, frame) Then
+				Delete newCoin.Coin
 			PlaySound coinCollect
 			score = score + 10
 		EndIf
 		Case 4
-		If ImagesCollide(purse, ((newcoin\coinx)-movX), ((newcoin\coiny)-movY), 0, player, player_posx, player_posy, frame) Then
-			Delete newcoin.Coins
+			If ImagesCollide(purse, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY), 0, player, playerPosX, playerPosY, frame) Then
+				Delete newCoin.Coin
 			PlaySound coinCollect
 			score = score + 50
 		EndIf 
 		Case 5
-		If ImagesCollide(creditcard, ((newcoin\coinx)-movX), ((newcoin\coiny)-movY), 0, player, player_posx, player_posy, frame) Then
-			Delete newcoin.Coins
+			If ImagesCollide(creditcard, ((newCoin\coinX)-movX), ((newCoin\coinY)-movY), 0, player, playerPosX, playerPosY, frame) Then
+				Delete newCoin.Coin
 			PlaySound coinCollect
 			score = score+Rnd(100,250) ; a number between 100 and 250 "euros"
 		EndIf 	
@@ -549,988 +557,962 @@ Function CoinCollision()
 End Function
 
 Function DrawMap()
-	For bricky = 0 To 24 
-		For brickx = 0 To 181
-			If actualLevel(brickx,bricky) = 1 Then
-				DrawImage brick,((brickx*32)-movX),((bricky*32)-movY) ; because the tile has the size of 32*32 pixels
+	For brickY = 0 To 24 
+		For brickX = 0 To 181
+			If(currentLevel(brickX,brickY)) Then
+				DrawImage(brick,((brickX*32)-movX),((brickY*32)-movY)) ;because the tile has the size of 32*32 pixels
 			EndIf
 		Next
 	Next
 End Function
 
 Function DrawEnergyItems()
-	For new_energy_object.energys = Each Energys
-		Select (new_energy_object\sort)
+	Local newEnergyObject.Energy
+	For newEnergyObject.Energy = Each Energy
+		Select (newEnergyObject\sort)
 			; 1: Sandwich, 2: Spicker
 			Case 1
-				DrawImage(sandwich,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY))
+				DrawImage(sandwich,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY))
 			Case 2
-				DrawImage(cheatpaper,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY))
+				DrawImage(cheatpaper,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY))
 			Case 3
-				DrawImage(energy,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY))
+				DrawImage(energy,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY))
 		End Select
 	Next
 End Function 
 
 Function EnergyItemsCollision()
-	If(tut=0) Then 	; if current level is NOT tutorial level
-		For new_energy_object.energys = Each Energys
-			Select(new_energy_object\sort)
+	If(tut<>0) Then Return ; if current level is NOT tutorial level
+	
+	Local newEnergyObject.Energy
+	For newEnergyObject.Energy = Each Energy
+		Select(newEnergyObject\sort)
+			Case 1
+				If(ImagesCollide(sandwich,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY),0,player,playerPosX,playerPosY,0)) Then
+					playerEnergy = playerEnergy+10
+					PlaySound eat
+					Delete newEnergyObject
+				EndIf
+			Case 2
+				If(ImagesCollide(cheatpaper,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY),0,player,playerPosX,playerPosY,0)) Then
+					playerEnergy = playerEnergy+15
+					Delete newEnergyObject
+				EndIf
+			Case 3
+				If(ImagesCollide(energy,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY),0,player,playerPosX,playerPosY,0)) Then
+					playerEnergy = playerEnergy+40
+					Delete newEnergyObject
+				EndIf
+		End Select
+	Next
+End Function 
+
+Function DrawSchoolItems()
+	Local newItem.School
+	For newItem.School = Each School
+		Select(newItem\schoolSort)
+		; 1-10: Math; 11-14: English, 15-21: History and so on
+		Case 1
+			DrawImage(root,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 2
+			DrawImage(urn,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 3
+			DrawImage(function0,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 4
+			DrawImage(function1,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 5
+			DrawImage(function2,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 6
+			DrawImage(function3,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 7
+			DrawImage(function4,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 8
+			DrawImage(function5,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 9
+			DrawImage(function6,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 10
+			DrawImage(function7,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 11
+			DrawImage(yeswecan,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 12
+			DrawImage(teatime,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 13
+			DrawImage(spo,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 14
+			DrawImage(usa,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 15
+			DrawImage(napoleon,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 16
+			DrawImage(hitler,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 17
+			DrawImage(honecker,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 18
+			DrawImage(fight,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 19
+			DrawImage(dates,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 20
+			DrawImage(germany,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 21
+			DrawImage(sed,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 22
+			DrawImage(goethe,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 23
+			DrawImage(schiller,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 24
+			DrawImage(lessing,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 25
+			DrawImage(parataxis,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 26
+			DrawImage(blackboard,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 27
+			DrawImage(duden,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 28
+			DrawImage(bars,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 29
+			DrawImage(rings,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 30
+			DrawImage(badminton,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 31
+			DrawImage(football,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 32
+			DrawImage(run,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 33
+			DrawImage(wallbars,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 34
+			DrawImage(stand,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 35
+			DrawImage(winnersteps,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 36
+			DrawImage(globe,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 37
+			DrawImage(atlas,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 38
+			DrawImage(weather,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 39
+			DrawImage(friends,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 40
+			DrawImage(geyser,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 41
+			DrawImage(watercyclus,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 42
+			DrawImage(note,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 43
+			DrawImage(guitar,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 44
+			DrawImage(notepaper,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 45
+			DrawImage(loudspeaker,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 46
+			DrawImage(piano,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 47
+			DrawImage(conductor,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 48
+			DrawImage(buzz,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 49
+			DrawImage(clefs,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 50
+			DrawImage(burner,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 51
+			DrawImage(testglass,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 52
+			DrawImage(nh3,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 53
+			DrawImage(goggles,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 54
+			DrawImage(kettle,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 55
+			DrawImage(c4,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 56
+			DrawImage(playray,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 57
+			DrawImage(joystick,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 58
+			DrawImage(pc_back,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 59
+			DrawImage(www,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 60
+			DrawImage(google,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 61
+			DrawImage(printer,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 62
+			DrawImage(abihelp,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 63
+			DrawImage(schillershead,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 64
+			DrawImage(mephisto,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 65
+			DrawImage(calculator,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 66
+			DrawImage(infinite,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 67
+			DrawImage(henning,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 68
+			DrawImage(dictionary,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 69
+			DrawImage(bratwurst,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 70
+			DrawImage(holyshit,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 71
+			DrawImage(electricapple,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 72
+			DrawImage(acid,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 73
+			DrawImage(pse,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 74
+			DrawImage(asia,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 75
+			DrawImage(europe,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 76
+			DrawImage(northamerica,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 77
+			DrawImage(southamerica,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 78
+			DrawImage(australia,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 79
+			DrawImage(africa,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		Case 80
+			DrawImage(antarctica,((newItem\schoolX)-movX),((newItem\schoolY)-movY))
+		End Select
+	Next
+End Function 
+
+Function SchoolItemsCollision()
+	If(tut<>0) Then Return
+	
+	Local newItem.School
+		For newItem.School = Each School
+			Select(newItem\schoolSort)
+		Case 1
+			If(ImagesCollide(root,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0)) Then
+			message = 1
+			creditPoints = creditPoints+3
+			PlaySound itemCollect
+			Delete newItem.School 
+		EndIf 
+		Case 2
+			If ImagesCollide(urn,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 2
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.School 
+		EndIf
+		Case 3
+			If ImagesCollide(function0,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 3
+			creditPoints = creditPoints + 5
+			PlaySound itemCollect
+			Delete newItem.School 
+		EndIf
+		Case 4
+			If ImagesCollide(function1,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 4
+			creditPoints = creditPoints + 7
+			PlaySound itemCollect
+			Delete newItem.School 
+		EndIf
+		Case 5
+			If ImagesCollide(function2,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 5
+			creditPoints = creditPoints + 6
+			PlaySound itemCollect
+			Delete newItem.School 
+		EndIf
+		Case 6
+			If ImagesCollide(function3,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 6
+			creditPoints = creditPoints + 8
+			PlaySound itemCollect
+			Delete newItem.School 
+		EndIf
+		Case 7
+			If ImagesCollide(function4,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 7
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school 
+		EndIf
+		Case 8
+			If ImagesCollide(function5,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 8
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school 
+			EndIf
+		Case 9
+			If ImagesCollide(function6,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 9
+			creditPoints = creditPoints + 12
+			PlaySound itemCollect
+			Delete newItem.school 
+		EndIf
+		Case 10
+			If ImagesCollide(function7,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 10
+			creditPoints = creditPoints + 15
+			PlaySound itemCollect
+			Delete newItem.school 
+		EndIf
+		Case 11
+			If ImagesCollide(yeswecan,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 11
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 12
+			If ImagesCollide(teatime,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 12
+			creditPoints = creditPoints + 6
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 13
+			If ImagesCollide(spo,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 13
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 14
+			If ImagesCollide(usa,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 14
+			creditPoints = creditPoints + 11
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 15
+			If ImagesCollide(napoleon,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 15
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 16
+			If ImagesCollide(hitler,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 16
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 17
+			If ImagesCollide(honecker,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 17
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 18
+			If ImagesCollide(fight,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 18
+			creditPoints = creditPoints + 7
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 19
+			If ImagesCollide(dates,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 19
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 20
+			If ImagesCollide(germany,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 20
+			creditPoints = creditPoints + 13
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 21
+			If ImagesCollide(sed,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 21
+			creditPoints = creditPoints + 8
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf 
+		Case 22
+			If ImagesCollide(goethe,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 22
+			creditPoints = creditPoints + 3
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 23
+			If ImagesCollide(schiller,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 23
+			creditPoints = creditPoints + 5
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 24
+			If ImagesCollide(lessing,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 24
+			creditPoints = creditPoints + 6
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 25
+			If ImagesCollide(parataxis,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 25
+			creditPoints = creditPoints + 8
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 26
+			If ImagesCollide(blackboard,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 26
+			creditPoints = creditPoints + 16
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 27
+			If ImagesCollide(duden,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 27
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 28
+			If ImagesCollide(bars,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 28
+			creditPoints = creditPoints + 5
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 29
+			If ImagesCollide(rings,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 29
+			creditPoints = creditPoints + 5
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 30
+			If ImagesCollide(badminton,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 30
+			creditPoints = creditPoints + 8
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 31
+			If ImagesCollide(football,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 31
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 32
+			If ImagesCollide(run,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 32
+			creditPoints = creditPoints + 11
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 33
+			If ImagesCollide(wallbars,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 33
+			creditPoints = creditPoints + 15
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 34
+			If ImagesCollide(stand,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 34
+			creditPoints = creditPoints + 13
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 35
+			If ImagesCollide(winnersteps,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 35
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 36
+			If ImagesCollide(globe,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 36
+			creditPoints = creditPoints + 6
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 37
+			If ImagesCollide(atlas,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 37
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 38
+			If ImagesCollide(weather,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 38
+			creditPoints = creditPoints + 14
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 39
+			If ImagesCollide(friends,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 39
+			creditPoints = creditPoints + 20
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 40
+			If ImagesCollide(geyser,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 40
+			creditPoints = creditPoints + 11
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 41
+			If ImagesCollide(watercyclus,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 41
+			creditPoints = creditPoints + 12
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 42
+			If ImagesCollide(note,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 42
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 43
+			If ImagesCollide(guitar,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 43
+			creditPoints = creditPoints + 7
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 44
+			If ImagesCollide(notepaper,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 44
+			creditPoints = creditPoints + 8
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 45
+			If ImagesCollide(loudspeaker,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 45
+			creditPoints = creditPoints + 11
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 46
+			If ImagesCollide(piano,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 46
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 47
+			If ImagesCollide(conductor,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 47
+			creditPoints = creditPoints + 12
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 48
+			If ImagesCollide(buzz,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 48
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf	
+		Case 49
+			If ImagesCollide(clefs,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 49
+			creditPoints = creditPoints + 14
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 50
+			If ImagesCollide(testglass,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 50
+			creditPoints = creditPoints + 9
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 51
+			If ImagesCollide(burner,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 51
+			creditPoints = creditPoints + 4
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 52
+			If ImagesCollide(nh3,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 52
+			creditPoints = creditPoints + 12
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 53
+			If ImagesCollide(goggles,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 53
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+			EndIf
+		Case 54
+			If ImagesCollide(kettle,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 54
+			creditPoints = creditPoints + 14
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 55
+			If ImagesCollide(c4,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 55
+			creditPoints = creditPoints + 7
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 56
+			If ImagesCollide(playray,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 56
+			creditPoints = creditPoints + 13
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 57
+			If ImagesCollide(joystick,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 57
+			creditPoints = creditPoints + 7
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 58
+			If ImagesCollide(pc_back,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 58
+			creditPoints = creditPoints + 8
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 59
+			If ImagesCollide(www,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 59
+			creditPoints = creditPoints + 7
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 60
+			If ImagesCollide(google,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 60
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 61
+			If ImagesCollide(printer,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 61
+			creditPoints = creditPoints + 13
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 62
+			If ImagesCollide(abihelp,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 62
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 63
+			If ImagesCollide(schillershead,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 63
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf	
+		Case 64
+			If ImagesCollide(mephisto,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 64
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 65
+			If ImagesCollide(dictionary,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 65
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 66
+			If ImagesCollide(bratwurst,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 66
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 67
+			If ImagesCollide(holyshit,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 67
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 68
+			If ImagesCollide(calculator,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 68
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 69
+			If ImagesCollide(infinite,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 69
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 70
+			If ImagesCollide(henning,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 70
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 71
+			If ImagesCollide(electricapple,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 71
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 72
+			If ImagesCollide(acid,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 72
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 73
+			If ImagesCollide(pse,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 73
+			creditPoints = creditPoints + 30
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 74
+			If ImagesCollide(asia,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 74
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 75
+			If ImagesCollide(europe,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 75
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 76
+			If ImagesCollide(northamerica,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 76
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 77
+			If ImagesCollide(southamerica,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 77
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 78
+			If ImagesCollide(australia,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 78
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 79
+			If ImagesCollide(africa,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 79
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		Case 80
+			If ImagesCollide(antarctica,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
+			message = 80
+			creditPoints = creditPoints + 10
+			PlaySound itemCollect
+			Delete newItem.school
+		EndIf
+		End Select
+	Next
+End Function
+
+Function DrawLessEnergyItems()
+	Local newLessEnergyObject.LessEnergy
+	For newLessEnergyObject.LessEnergy = Each LessEnergy
+		Select(newLessEnergyObject\lessEnSort)
+		;1=Toilet, 2=Food, 3=Ashtray
+		Case 1
+			DrawImage(toilet,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY))
+		Case 2
+			DrawImage(food,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY))
+		Case 3
+			DrawImage(ashtray,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY))
+		End Select
+	Next
+End Function 
+
+Function LessEnergyItemsCollision()
+	If(tut<>0) Then Return
+	
+	If(MilliSecs()-restTime>timeValue) Then
+		Local newLessEnergyObject.LessEnergy
+		For newLessEnergyObject.LessEnergy = Each LessEnergy
+			Select(newLessEnergyObject\lessEnSort)
 				Case 1
-					If ImagesCollide(sandwich,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY),0,player,player_posx,player_posy,0) Then
-						player_Energy = player_Energy + 10
-						PlaySound eat
-						Delete new_energy_object
-					EndIf
+					If(ImagesCollide(toilet,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY),0,player,playerPosX,playerPosY,0)) Then
+						playerEnergy = playerEnergy-10
+						Delete newLessEnergyObject.LessEnergy
+					EndIf 
 				Case 2
-					If ImagesCollide(cheatpaper,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY),0,player,player_posx,player_posy,0) Then
-						player_Energy = player_Energy + 15
-						Delete new_energy_object
-					EndIf
+					If(ImagesCollide(food,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY),0,player,playerPosX,playerPosY,0)) Then
+						playerEnergy = playerEnergy-15
+						Delete newLessEnergyObject.LessEnergy
+					EndIf 
 				Case 3
-					If ImagesCollide(energy,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY),0,player,player_posx,player_posy,0) Then
-						player_Energy = player_Energy + 40
-						Delete new_energy_object
+					If(ImagesCollide(ashtray,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY),0,player,playerPosX,playerPosY,0)) Then
+						playerEnergy = playerEnergy-20
+						Delete newLessEnergyObject.LessEnergy
 					EndIf
 			End Select
 		Next
 	EndIf 
 End Function 
 
-Function DrawSchoolItems()
-	For newitem.school = Each School
-		Select(newitem\school_sort)
-		; 1-10: Math; 11-14: English, 15-21: History and so on
-		Case 1
-			DrawImage root,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 2
-			DrawImage urn,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 3
-			DrawImage function0,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 4
-			DrawImage function1,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 5
-			DrawImage function2,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 6
-			DrawImage function3,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 7
-			DrawImage function4,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 8
-			DrawImage function5,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 9
-			DrawImage function6,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 10
-			DrawImage function7,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 11
-			DrawImage yeswecan,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 12
-			DrawImage teatime,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 13
-			DrawImage spo,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 14
-			DrawImage usa,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 15
-			DrawImage napoleon,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 16
-			DrawImage hitler,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 17
-			DrawImage honecker,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 18
-			DrawImage fight,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 19
-			DrawImage dates,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 20
-			DrawImage germany,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 21
-			DrawImage sed,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 22
-			DrawImage goethe,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 23
-			DrawImage schiller,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 24
-			DrawImage lessing,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 25
-			DrawImage parataxis,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 26
-			DrawImage blackboard,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 27
-			DrawImage duden,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 28
-			DrawImage bars,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 29
-			DrawImage rings,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 30
-			DrawImage badminton,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 31
-			DrawImage football,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 32
-			DrawImage run,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 33
-			DrawImage wallbars,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 34
-			DrawImage stand,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 35
-			DrawImage winnersteps,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 36
-			DrawImage globe,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 37
-			DrawImage atlas,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 38
-			DrawImage weather,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 39
-			DrawImage friends,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 40
-			DrawImage geyser,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 41
-			DrawImage watercyclus,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 42
-			DrawImage note,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 43
-			DrawImage guitar,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 44
-			DrawImage notepaper,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 45
-			DrawImage loudspeaker,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 46
-			DrawImage piano,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 47
-			DrawImage conductor,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 48
-			DrawImage buzz,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 49
-			DrawImage clefs,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 50
-			DrawImage burner,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 51
-			DrawImage testglass,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 52
-			DrawImage nh3,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 53
-			DrawImage goggles,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 54
-			DrawImage kettle,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 55
-			DrawImage c4,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 56
-			DrawImage playray,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 57
-			DrawImage joystick,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 58
-			DrawImage pc_back,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 59
-			DrawImage www,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 60
-			DrawImage google,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 61
-			DrawImage printer,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 62
-			DrawImage abihelp,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 63
-			DrawImage schillershead,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 64
-			DrawImage mephisto,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 65
-			DrawImage calculator,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 66
-			DrawImage infinite,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 67
-			DrawImage henning,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 68
-			DrawImage dictionary,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 69
-			DrawImage bratwurst,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 70
-			DrawImage holyshit,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 71
-			DrawImage electricapple,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 72
-			DrawImage acid,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 73
-			DrawImage pse,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 74
-			DrawImage asia,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 75
-			DrawImage europe,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 76
-			DrawImage northamerica,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 77
-			DrawImage southamerica,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 78
-			DrawImage australia,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 79
-			DrawImage africa,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		Case 80
-			DrawImage antarctica,((newitem\school_x)-movX),((newitem\school_y)-movY)
-		End Select
-	Next
-End Function 
-
-Function SchoolItemsCollision()
-	If tut = 0 Then
-	For newitem.school = Each School
-		Select (newitem\school_sort)
-		Case 1
-		If ImagesCollide(root,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 1
-			creditPoints = creditPoints + 3
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf 
-		Case 2
-		If ImagesCollide(urn,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 2
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 3
-		If ImagesCollide(function0,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 3
-			creditPoints = creditPoints + 5
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 4
-		If ImagesCollide(function1,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 4
-			creditPoints = creditPoints + 7
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 5
-		If ImagesCollide(function2,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 5
-			creditPoints = creditPoints + 6
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 6
-			If ImagesCollide(function3,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 6
-			creditPoints = creditPoints + 8
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 7
-			If ImagesCollide(function4,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 7
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 8
-			If ImagesCollide(function5,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 8
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school 
-			EndIf
-		Case 9
-		If ImagesCollide(function6,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 9
-			creditPoints = creditPoints + 12
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 10
-			If ImagesCollide(function7,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 10
-			creditPoints = creditPoints + 15
-			PlaySound itemCollect
-			Delete newitem.school 
-		EndIf
-		Case 11
-		If ImagesCollide(yeswecan,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 11
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 12
-		If ImagesCollide(teatime,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 12
-			creditPoints = creditPoints + 6
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 13
-		If ImagesCollide(spo,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 13
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 14
-		If ImagesCollide(usa,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 14
-			creditPoints = creditPoints + 11
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 15
-		If ImagesCollide(napoleon,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 15
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 16
-		If ImagesCollide(hitler,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 16
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 17
-		If ImagesCollide(honecker,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 17
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 18
-		If ImagesCollide(fight,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 18
-			creditPoints = creditPoints + 7
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 19
-		If ImagesCollide(dates,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 19
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 20
-		If ImagesCollide(germany,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 20
-			creditPoints = creditPoints + 13
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 21
-		If ImagesCollide(sed,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 21
-			creditPoints = creditPoints + 8
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf 
-		Case 22
-		If ImagesCollide(goethe,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 22
-			creditPoints = creditPoints + 3
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 23
-		If ImagesCollide(schiller,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 23
-			creditPoints = creditPoints + 5
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 24
-		If ImagesCollide(lessing,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 24
-			creditPoints = creditPoints + 6
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 25
-		If ImagesCollide(parataxis,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 25
-			creditPoints = creditPoints + 8
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 26
-			If ImagesCollide(blackboard,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 26
-			creditPoints = creditPoints + 16
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 27
-			If ImagesCollide(duden,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 27
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 28
-		If ImagesCollide(bars,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 28
-			creditPoints = creditPoints + 5
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 29
-		If ImagesCollide(rings,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 29
-			creditPoints = creditPoints + 5
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 30
-		If ImagesCollide(badminton,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 30
-			creditPoints = creditPoints + 8
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 31
-		If ImagesCollide(football,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 31
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 32
-		If ImagesCollide(run,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 32
-			creditPoints = creditPoints + 11
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 33
-		If ImagesCollide(wallbars,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 33
-			creditPoints = creditPoints + 15
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 34
-		If ImagesCollide(stand,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 34
-			creditPoints = creditPoints + 13
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 35
-		If ImagesCollide(winnersteps,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 35
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 36
-		If ImagesCollide(globe,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 36
-			creditPoints = creditPoints + 6
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 37
-		If ImagesCollide(atlas,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 37
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 38
-		If ImagesCollide(weather,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 38
-			creditPoints = creditPoints + 14
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 39
-		If ImagesCollide(friends,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 39
-			creditPoints = creditPoints + 20
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 40
-		If ImagesCollide(geyser,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 40
-			creditPoints = creditPoints + 11
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 41
-		If ImagesCollide(watercyclus,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 41
-			creditPoints = creditPoints + 12
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 42
-		If ImagesCollide(note,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 42
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 43
-		If ImagesCollide(guitar,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 43
-			creditPoints = creditPoints + 7
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 44
-		If ImagesCollide(notepaper,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 44
-			creditPoints = creditPoints + 8
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 45
-		If ImagesCollide(loudspeaker,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 45
-			creditPoints = creditPoints + 11
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 46
-		If ImagesCollide(piano,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 46
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 47
-		If ImagesCollide(conductor,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 47
-			creditPoints = creditPoints + 12
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 48
-		If ImagesCollide(buzz,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 48
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf	
-		Case 49
-		If ImagesCollide(clefs,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 49
-			creditPoints = creditPoints + 14
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 50
-		If ImagesCollide(testglass,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 50
-			creditPoints = creditPoints + 9
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 51
-		If ImagesCollide(burner,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 51
-			creditPoints = creditPoints + 4
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 52
-		If ImagesCollide(nh3,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 52
-			creditPoints = creditPoints + 12
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 53
-		If ImagesCollide(goggles,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 53
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-			EndIf
-		Case 54
-		If ImagesCollide(kettle,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 54
-			creditPoints = creditPoints + 14
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 55
-		If ImagesCollide(c4,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 55
-			creditPoints = creditPoints + 7
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 56
-			If ImagesCollide(playray,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 56
-			creditPoints = creditPoints + 13
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 57
-		If ImagesCollide(joystick,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 57
-			creditPoints = creditPoints + 7
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 58
-		If ImagesCollide(pc_back,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 58
-			creditPoints = creditPoints + 8
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 59
-		If ImagesCollide(www,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 59
-			creditPoints = creditPoints + 7
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 60
-		If ImagesCollide(google,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 60
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 61
-		If ImagesCollide(printer,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 61
-			creditPoints = creditPoints + 13
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 62
-		If ImagesCollide(abihelp,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 62
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 63
-		If ImagesCollide(schillershead,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 63
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf	
-		Case 64
-		If ImagesCollide(mephisto,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 64
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 65
-		If ImagesCollide(dictionary,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 65
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 66
-		If ImagesCollide(bratwurst,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 66
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 67
-		If ImagesCollide(holyshit,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 67
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 68
-		If ImagesCollide(calculator,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 68
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 69
-		If ImagesCollide(infinite,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 69
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 70
-		If ImagesCollide(henning,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 70
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 71
-		If ImagesCollide(electricapple,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 71
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 72
-		If ImagesCollide(acid,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 72
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 73
-		If ImagesCollide(pse,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 73
-			creditPoints = creditPoints + 30
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 74
-		If ImagesCollide(asia,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 74
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 75
-		If ImagesCollide(europe,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 75
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 76
-		If ImagesCollide(northamerica,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 76
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 77
-		If ImagesCollide(southamerica,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 77
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 78
-		If ImagesCollide(australia,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 78
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 79
-		If ImagesCollide(africa,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 79
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		Case 80
-		If ImagesCollide(antarctica,((newitem\school_x)-movX),((newitem\school_y)-movY),0,player,player_posx,player_posy,0) Then
-			message = 80
-			creditPoints = creditPoints + 10
-			PlaySound itemCollect
-			Delete newitem.school
-		EndIf
-		End Select
-	Next
-	EndIf 
-End Function
-
-Function DrawLessEnergyItems()
-	For new_less_energy_object.less_energys = Each Less_energys
-		Select(new_less_energy_object\less_en_sort)
-		; 1=Toilet, 2=Food, 3=Ashtray
-		Case 1
-			DrawImage toilet,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY)
-		Case 2
-			DrawImage food,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY)
-		Case 3
-			DrawImage ashtray,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY)
-		End Select
-	Next
-End Function 
-
-Function LessEnergyItemsCollision()
-	If tut = 0 Then
-		If (MilliSecs()-pauseTime > timeValue) Then
-			For new_less_energy_object.less_energys = Each Less_energys
-				Select (new_less_energy_object\less_en_sort)
-				Case 1
-					If ImagesCollide(toilet,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY),0,player,player_posx,player_posy,0) Then
-					player_Energy = player_Energy - 10
-					Delete new_less_energy_object.less_energys
-					EndIf 
-				Case 2
-					If ImagesCollide(food,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY),0,player,player_posx,player_posy,0) Then
-					player_Energy = player_Energy - 15
-					Delete new_less_energy_object.less_energys
-					EndIf 
-				Case 3
-					If ImagesCollide(ashtray,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY),0,player,player_posx,player_posy,0) Then
-					player_Energy = player_Energy - 20
-					Delete new_less_energy_object.less_energys
-					EndIf
-				End Select
-			Next
-		EndIf 
-	EndIf 
-End Function 
-
 ;drawing the monsters
 Function DrawMonsters()
-	For new_monster.Monster = Each Monster
-		Select(new_monster\Monster_type)
-			Case 1: DrawImage monsterLazy, (new_monster\Pos_x)-movX, (new_monster\Pos_y)-movY, new_monster\Frame
-			Case 2 : DrawImage monsterNaughty, (new_monster\Pos_x)-movX, (new_monster\Pos_y)-movY, new_monster\Frame
-			Case 3 : DrawImage monsterZero, (new_monster\Pos_x)-movX, (new_monster\Pos_y)-movY, new_monster\Frame
-			Case 4 : DrawImage monsterHonk, (new_monster\Pos_x)-movX, (new_monster\Pos_y)-movY, new_monster\Frame
+	For newMonster.Monster = Each Monster
+		Select(newMonster\sort)
+			Case 1: DrawImage(monsterLazy, (newMonster\posX)-movX, (newMonster\posY)-movY, newMonster\frame)
+			Case 2 : DrawImage(monsterNaughty, (newMonster\posX)-movX, (newMonster\posY)-movY, newMonster\frame)
+			Case 3 : DrawImage(monsterZero, (newMonster\posX)-movX, (newMonster\posY)-movY, newMonster\frame)
+			Case 4 : DrawImage(monsterHonk, (newMonster\posX)-movX, (newMonster\posY)-movY, newMonster\frame)
 		End Select
 	Next 	
 End Function 
 
 Function MoveMonsters()
-	If(moveAny=1) Then
-		If(MilliSecs()-pauseTime>timeValue) Then
-			For new_monster.Monster = Each Monster
-				If(new_monster\Monster_type=1) Then 
-					If(new_monster\Direction=1) Then
-						If(new_monster\Pos_x-new_monster\Start_x<=80) Then
-							new_monster\Pos_x = new_monster\Pos_x+2
-							If new_monster\Frame >3 Then new_monster\Frame = 0
-							new_monster\Anim_counter = new_monster\Anim_counter -1
-							If new_monster\Anim_counter = 0 Then
-								new_monster\Anim_counter = 8
-								new_monster\Frame = new_monster\Frame +1
-								If new_monster\Frame = 4 Then new_monster\Frame = 0
-							EndIf 
+	If(moveAny<>1) Then Return
+	
+	If(MilliSecs()-restTime>timeValue) Then
+		For newMonster.Monster = Each Monster
+			If(newMonster\sort=1) Then 
+				If(newMonster\direction=1) Then
+					If(newMonster\posX-newMonster\startX<=80) Then
+						newMonster\posX = newMonster\posX+2
+						If(newMonster\frame>3) Then newMonster\frame = 0
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame=4) Then newMonster\frame = 0
 						EndIf 
-						
-						If(new_monster\Pos_x - new_monster\Start_x > 80) Then new_monster\Direction = 0 ; change left
-					ElseIf new_monster\Direction = 0 Then
-						If(new_monster\Pos_x - new_monster\Start_x >= -80) Then 
-							new_monster\Pos_x = new_monster\Pos_x - 2
-							If new_monster\Frame >3 Then new_monster\Frame = 0
-							new_monster\Anim_counter = new_monster\Anim_counter -1
-							If new_monster\Anim_counter = 0 Then
-								new_monster\Anim_counter = 8
-								new_monster\Frame = new_monster\Frame +1
-								If new_monster\Frame > 3 Then new_monster\Frame = 0
-							EndIf 
-						EndIf
-					
-					If (new_monster\Pos_x - new_monster\Start_x < -80) Then new_monster\Direction = 1 ; change right
-					EndIf 	
-		
-			ElseIf new_monster\Monster_type = 2 Then
-				If new_monster\Direction = 1 Then
-	
-				If (new_monster\Pos_x - new_monster\Start_x <= 70) Then
-		
-					new_monster\Pos_x = new_monster\Pos_x + 2
-					If new_monster\Frame >4 Then new_monster\Frame = 0
-					new_monster\Anim_counter = new_monster\Anim_counter -1
-					If new_monster\Anim_counter = 0 Then
-						new_monster\Anim_counter = 8
-						new_monster\Frame = new_monster\Frame +1
-						If new_monster\Frame > 4 Then new_monster\Frame = 0
-					EndIf 
-					EndIf 
-					
-				If (new_monster\Pos_x - new_monster\Start_x > 70) Then new_monster\Direction = 0 ; change left
-				
-				ElseIf new_monster\Direction = 0 Then
-	
-				If (new_monster\Pos_x - new_monster\Start_x >= -70) Then
-	
-					new_monster\Pos_x = new_monster\Pos_x - 2
-					If new_monster\Frame >8 Then new_monster\Frame = 5
-					new_monster\Anim_counter = new_monster\Anim_counter -1
-					If new_monster\Anim_counter = 0 Then
-						new_monster\Anim_counter = 8
-						new_monster\Frame = new_monster\Frame +1
-						If new_monster\Frame > 8 Then new_monster\Frame = 5
-					EndIf 
 					EndIf
-					
-					If (new_monster\Pos_x - new_monster\Start_x < -70) Then new_monster\Direction = 1 ; change right
-					
+					If(newMonster\posX-newMonster\startX>80) Then newMonster\direction = 0 ;change left
+				ElseIf(newMonster\direction=0) Then
+					If(newMonster\posX-newMonster\startX>=-80) Then 
+						newMonster\posX = newMonster\posX-2
+						If(newMonster\frame>3) Then newMonster\frame = 0
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>3) Then newMonster\frame = 0
+						EndIf 
+					EndIf
+					If(newMonster\posX-newMonster\startX<-80) Then newMonster\direction = 1 ;change right
 				EndIf
-			
-			ElseIf new_monster\Monster_type = 3 Then
-				If new_monster\Direction = 1 Then
-	
-				If (new_monster\Pos_x - new_monster\Start_x <= 70) Then
-		
-					new_monster\Pos_x = new_monster\Pos_x + 2
-					If new_monster\Frame >3 Then new_monster\Frame = 0
-					new_monster\Anim_counter = new_monster\Anim_counter -1
-					If new_monster\Anim_counter = 0 Then
-						new_monster\Anim_counter = 8
-						new_monster\Frame = new_monster\Frame +1
-						If new_monster\Frame > 3 Then new_monster\Frame = 0
+			ElseIf(newMonster\sort=2) Then
+				If(newMonster\direction=1) Then
+					If(newMonster\posX-newMonster\startX<=70) Then
+						newMonster\posX = newMonster\posX + 2
+						If(newMonster\frame>4) Then newMonster\frame = 0
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter = 0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>4) Then newMonster\frame = 0
+						EndIf 
 					EndIf 
-					EndIf 
-					
-				If (new_monster\Pos_x - new_monster\Start_x > 70) Then new_monster\Direction = 0 ; change left
-				
-				
-				ElseIf new_monster\Direction = 0 Then
-	
-				If (new_monster\Pos_x - new_monster\Start_x >= -70) Then
-	
-					new_monster\Pos_x = new_monster\Pos_x - 2
-					If new_monster\Frame >3 Then new_monster\Frame = 0
-					new_monster\Anim_counter = new_monster\Anim_counter -1
-					If new_monster\Anim_counter = 0 Then
-						new_monster\Anim_counter = 8
-						new_monster\Frame = new_monster\Frame +1
-						If new_monster\Frame > 3 Then new_monster\Frame = 0
-					EndIf 
+					If(newMonster\posX-newMonster\startX>70) Then newMonster\direction = 0 ;change left
+				ElseIf(newMonster\direction=0) Then
+					If(newMonster\posX-newMonster\startX>=-70) Then
+						newMonster\posX = newMonster\posX - 2
+						If(newMonster\frame>8) Then newMonster\frame = 5
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>8) Then newMonster\frame = 5
+						EndIf 
 					EndIf
-					
-					If (new_monster\Pos_x - new_monster\Start_x < -70) Then new_monster\Direction = 1 ; change right
-					
+					If(newMonster\posX-newMonster\startX<-70) Then newMonster\direction = 1 ;change right
 				EndIf
-			
-			ElseIf new_monster\Monster_type = 4 Then
-				If new_monster\Direction = 1 Then
-	
-				If (new_monster\Pos_x - new_monster\Start_x <= 70) Then
-		
-					new_monster\Pos_x = new_monster\Pos_x + Rnd(1,6)
-					If new_monster\Frame >2 Then new_monster\Frame = 0
-					new_monster\Anim_counter = new_monster\Anim_counter -1
-					If new_monster\Anim_counter = 0 Then
-						new_monster\Anim_counter = 8
-						new_monster\Frame = new_monster\Frame +1
-						If new_monster\Frame > 2 Then new_monster\Frame = 0
-					EndIf 
-					EndIf 
-					
-				If (new_monster\Pos_x - new_monster\Start_x > 70) Then new_monster\Direction = 0 ; change left
-				
-				
-				ElseIf new_monster\Direction = 0 Then
-	
-				If (new_monster\Pos_x - new_monster\Start_x >= -70) Then
-	
-					new_monster\Pos_x = new_monster\Pos_x - Rnd(1,6)
-					If new_monster\Frame >5 Then new_monster\Frame = 3
-					new_monster\Anim_counter = new_monster\Anim_counter -1
-					If new_monster\Anim_counter = 0 Then
-						new_monster\Anim_counter = 8
-						new_monster\Frame = new_monster\Frame +1
-						If new_monster\Frame > 5 Then new_monster\Frame = 3
-					EndIf 
+			ElseIf(newMonster\sort=3) Then
+				If(newMonster\direction=1) Then
+					If(newMonster\posX-newMonster\startX<=70) Then
+						newMonster\posX = newMonster\posX+2
+						If(newMonster\frame>3) Then newMonster\frame = 0
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>3) Then newMonster\frame = 0
+						EndIf 
 					EndIf
-					
-					If (new_monster\Pos_x - new_monster\Start_x < -70) Then new_monster\Direction = 1 ; change right
-					
+					If(newMonster\posX-newMonster\startX>70) Then newMonster\direction = 0 ;change left
+				ElseIf(newMonster\direction=0) Then
+					If(newMonster\posX-newMonster\startX>=-70) Then
+						newMonster\posX = newMonster\posX-2
+						If(newMonster\frame>3) Then newMonster\frame = 0
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>3) Then newMonster\frame = 0
+						EndIf 
+					EndIf
+					If(newMonster\posX-newMonster\startX<-70) Then newMonster\direction = 1 ;change right
+				EndIf
+			ElseIf(newMonster\sort=4) Then
+				If(newMonster\direction=1) Then
+					If(newMonster\posX-newMonster\startX<=70) Then
+						newMonster\posX = newMonster\posX+Rnd(1,6)
+						If(newMonster\frame>2) Then newMonster\frame = 0
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>2) Then newMonster\frame = 0
+						EndIf 
+					EndIf
+					If(newMonster\posX-newMonster\startX>70) Then newMonster\direction = 0 ;change left
+				ElseIf(newMonster\direction=0) Then
+					If(newMonster\posX-newMonster\startX>=-70) Then
+						newMonster\posX = newMonster\posX-Rnd(1,6)
+						If(newMonster\frame>5) Then newMonster\frame = 3
+						newMonster\animCounter = newMonster\animCounter-1
+						If(newMonster\animCounter=0) Then
+							newMonster\animCounter = 8
+							newMonster\frame = newMonster\frame+1
+							If(newMonster\frame>5) Then newMonster\frame = 3
+						EndIf 
+					EndIf
+					If(newMonster\posX-newMonster\startX<-70) Then newMonster\direction = 1 ;change right
 				EndIf
 			EndIf  
-			Next
-		EndIf 
-EndIf 
-
-End Function 
+		Next
+	EndIf
+End Function
 
 Function ChooseLevel()
 	Select level
@@ -1573,7 +1555,7 @@ Function ChooseLevel()
 				ClsColor Rnd(0,255),Rnd(0,255),Rnd(0,255)
 				LoadLevel(1)
 				moveAny = 0
-				player_move = 0
+				playerMove = 0
 				doDrawPlayer = 0
 			EndIf 
 		TextAbitur()
@@ -1598,167 +1580,151 @@ Function ChooseLevel()
 				ClsColor Rnd(0,255),Rnd(0,255),Rnd(0,255)
 				LoadLevel(1)
 				moveAny = 0
-				player_move = 0
+				playerMove = 0
 				doDrawPlayer = 0
 			EndIf 
 			ShowAbi() 
 	End Select
 
 	;another important thing: if energy <= 0 then start last level again
-	If player_Energy <= 0 Or KeyHit(68) Then
-		If start = 1 Then
-		start = 0
-		PlaySound levelAgain
-			If GivePos = 0 Then
-			GivePos = 1
-			Select level
-				Case 2
-				movX = MOVX_LVL1
-				movY = Movy_Lvl1
-				Case 3
-				movX = MOVX_LVL2
-				movY = Movy_Lvl2
-				Case 4
-				movX = MOVX_LVL3
-				movY = Movy_Lvl3
-				Case 5
-				movX = MOVX_LVL4
-				movY = Movy_Lvl4
-				Case 6
-				movX = Movx_Lvl5
-				movY = Movy_Lvl5
-				Case 7
-				movX = Movx_Lvl6
-				movY = Movy_Lvl6
-				Case 8
-				movX = Movx_Lvl7
-				movY = Movy_Lvl7
-			End Select 
-			Delay 1000
-			player_Energy = 100
-			lives = lives - 1 
-			ElseIf GivePos = 1 Then
+	If(playerEnergy<=0 Or KeyHit(68)) Then
+		If(start=1) Then
+			start = 0
+			PlaySound(levelAgain)
+			If(GivePos=0) Then
+				GivePos = 1
+				Select level
+					Case 2
+						movX = MOVX_LVL1
+						movY = Movy_Lvl1
+					Case 3
+						movX = MOVX_LVL2
+						movY = Movy_Lvl2
+					Case 4
+						movX = MOVX_LVL3
+						movY = Movy_Lvl3
+					Case 5
+						movX = MOVX_LVL4
+						movY = Movy_Lvl4
+					Case 6
+						movX = Movx_Lvl5
+						movY = Movy_Lvl5
+					Case 7
+						movX = Movx_Lvl6
+						movY = Movy_Lvl6
+					Case 8
+						movX = Movx_Lvl7
+						movY = Movy_Lvl7
+				End Select
+				Delay(1000)
+				playerEnergy = 100
+				lives = lives-1 
+			ElseIf(GivePos=1) Then
 				GivePos = 0
 				Select level
-				Case 2
-				movX = MOVX_LVL1
-				movY = Movy_Lvl1
-				Case 3
-				movX = MOVX_LVL2
-				movY = Movy_Lvl2
-				Case 4
-				movX = MOVX_LVL3
-				movY = Movy_Lvl3
-				Case 5
-				movX = MOVX_LVL4
-				movY = Movy_Lvl4
-				Case 6
-				movX = Movx_Lvl5
-				movY = Movy_Lvl5
-				Case 7
-				movX = Movx_Lvl6
-				movY = Movy_Lvl6
-				Case 8
-				movX = Movx_Lvl7
-				movY = Movy_Lvl7
-			End Select 
-			Delay 1000
-			player_Energy = 100
-			lives = lives - 1
-			EndIf 
-		ElseIf start = 0 Then
+					Case 2
+						movX = MOVX_LVL1
+						movY = Movy_Lvl1
+					Case 3
+						movX = MOVX_LVL2
+						movY = Movy_Lvl2
+					Case 4
+						movX = MOVX_LVL3
+						movY = Movy_Lvl3
+					Case 5
+						movX = MOVX_LVL4
+						movY = Movy_Lvl4
+					Case 6
+						movX = Movx_Lvl5
+						movY = Movy_Lvl5
+					Case 7
+						movX = Movx_Lvl6
+						movY = Movy_Lvl6
+					Case 8
+						movX = Movx_Lvl7
+						movY = Movy_Lvl7
+				End Select 
+				Delay(1000)
+				playerEnergy = 100
+				lives = lives-1
+			EndIf
+		ElseIf(start=0) Then
 			start = 1
-			If GivePos = 0 Then
-			GivePos = 1
-			Select level
-				Case 2
-				movX = MOVX_LVL1
-				movY = Movy_Lvl1
-				Case 3
-				movX = MOVX_LVL2
-				movY = Movy_Lvl2
-				Case 4
-				movX = MOVX_LVL3
-				movY = Movy_Lvl3
-				Case 5
-				movX = MOVX_LVL4
-				movY = Movy_Lvl4
-				Case 6
-				movX = Movx_Lvl5
-				movY = Movy_Lvl5
-				Case 7
-				movX = Movx_Lvl6
-				movY = Movy_Lvl6
-				Case 8
-				movX = Movx_Lvl7
-				movY = Movy_Lvl7
-			End Select 
-			Delay 1000
-			player_Energy = 100
-			lives = lives - 1 
-			ElseIf GivePos = 1 Then
-			GivePos = 0
-			Select level
-				Case 2
-				movX = MOVX_LVL1
-				movY = Movy_Lvl1
-				Case 3
-				movX = MOVX_LVL2
-				movY = Movy_Lvl2
-				Case 4
-				movX = MOVX_LVL3
-				movY = Movy_Lvl3
-				Case 5
-				movX = MOVX_LVL4
-				movY = Movy_Lvl4
-				Case 6
-				movX = Movx_Lvl5
-				movY = Movy_Lvl5
-				Case 7
-				movX = Movx_Lvl6
-				movY = Movy_Lvl6
-				Case 8
-				movX = Movx_Lvl7
-				movY = Movy_Lvl7
-			End Select 
-			Delay 1000
-			player_Energy = 100
-			lives = lives - 1 
+			If(GivePos=0) Then
+				GivePos = 1
+				Select level
+					Case 2
+						movX = MOVX_LVL1
+						movY = Movy_Lvl1
+					Case 3
+						movX = MOVX_LVL2
+						movY = Movy_Lvl2
+					Case 4
+						movX = MOVX_LVL3
+						movY = Movy_Lvl3
+					Case 5
+						movX = MOVX_LVL4
+						movY = Movy_Lvl4
+					Case 6
+						movX = Movx_Lvl5
+						movY = Movy_Lvl5
+					Case 7
+						movX = Movx_Lvl6
+						movY = Movy_Lvl6
+					Case 8
+						movX = Movx_Lvl7
+						movY = Movy_Lvl7
+				End Select 
+				Delay(1000)
+				playerEnergy = 100
+				lives = lives-1 
+			ElseIf(GivePos=1) Then
+				GivePos = 0
+				Select level
+					Case 2
+						movX = MOVX_LVL1
+						movY = Movy_Lvl1
+					Case 3
+						movX = MOVX_LVL2
+						movY = Movy_Lvl2
+					Case 4
+						movX = MOVX_LVL3
+						movY = Movy_Lvl3
+					Case 5
+						movX = MOVX_LVL4
+						movY = Movy_Lvl4
+					Case 6
+						movX = Movx_Lvl5
+						movY = Movy_Lvl5
+					Case 7
+						movX = Movx_Lvl6
+						movY = Movy_Lvl6
+					Case 8
+						movX = Movx_Lvl7
+						movY = Movy_Lvl7
+				End Select 
+				Delay(1000)
+				playerEnergy = 100
+				lives = lives-1 
 			EndIf 
 		EndIf 
 	EndIf   
-	If lives <= 0 Then
-		For newcoin.Coins = Each Coins
-			Delete newcoin.Coins
-		Next
-		For new_energy_object.energys = Each Energys
-		Delete New_energy_object.energys
-		Next
-		For newitem.school = Each School
-		Delete newitem.school
-		Next
-		For new_less_energy_object.less_energys = Each Less_energys
-		Delete new_less_energy_object.less_energys
-		Next
-		For new_monster.Monster = Each Monster
-		Delete new_monster.Monster
-		Next
-		For new_teacher.teacher = Each Teacher
-		Delete new_teacher.teacher
-		Next
-		For new_sneak.sneak = Each Sneak
-		Delete new_sneak.sneak
-		Next
-		For new_pause.pause = Each Pause
-		Delete new_pause.pause
-	Next 
-	LoadLevel(1)
+	If(lives<=0) Then
+		Delete Each Coin
+		Delete Each Energy
+		Delete Each School
+		Delete Each LessEnergy
+		Delete Each Monster
+		Delete Each Teacher
+		Delete Each Sneak
+		Delete Each Rest
+		LoadLevel(1)
 		text_var = 0
 		movX = 5400
 		movY = 480
-		Text 200,200,"Du bist zu oft sitzen geblieben. Jetzt musst du leider wieder von vorne anfangen."
-		Text 200,215,"Bitte [Enter] drücken..."
-			If KeyHit(28) Then
+		Text(200,200,"Du bist zu oft sitzen geblieben. Jetzt musst du leider wieder von vorne anfangen.")
+		Text(200,215,"Bitte [Enter] drücken...")
+		If(KeyHit(28)) Then
 			movX = (-288)
 			movY = 480
 			level = 1
@@ -1770,29 +1736,28 @@ End Function
 
 Function MonsterCollision()
 If moveAny = 1 Then 
-If (MilliSecs()-pauseTime > timeValue) Then; if player didnt collect a pause
-
-For new_monster.Monster = Each Monster
-	If new_monster\Monster_type = 1 Then
-		If ImagesCollide(monsterLazy,(new_monster\Pos_x)-movX,(new_monster\Pos_y)-movY,0,player,player_posx,player_posy,0) Then
-		player_Energy = player_Energy - 15
-		Delete new_monster.Monster
+	If(MilliSecs()-restTime>timeValue) Then	; if player didn't collect a Rest
+		For newMonster.Monster = Each Monster
+			If(newMonster\sort=1) Then
+				If(ImagesCollide(monsterLazy,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0)) Then
+					playerEnergy = playerEnergy - 15
+		Delete newMonster.Monster
 	EndIf 
-	ElseIf new_monster\Monster_type = 2 Then
-		If ImagesCollide(monsterNaughty,(new_monster\Pos_x)-movX,(new_monster\Pos_y)-movY,0,player,player_posx,player_posy,0) Then
+ElseIf newMonster\sort = 2 Then
+	If ImagesCollide(monsterNaughty,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0) Then
 		creditPoints = creditPoints - 15
-		Delete new_monster.Monster
+		Delete newMonster.Monster
 	EndIf 
-	ElseIf new_monster\Monster_type = 3 Then
-		If ImagesCollide(monsterZero,(new_monster\Pos_x)-movX,(new_monster\Pos_y)-movY,0,player,player_posx,player_posy,0) Then
-		player_Energy = player_Energy - 25
-		Delete new_monster.Monster
+ElseIf newMonster\sort = 3 Then
+	If ImagesCollide(monsterZero,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0) Then
+		playerEnergy = playerEnergy - 25
+		Delete newMonster.Monster
 	EndIf 
-	ElseIf new_monster\Monster_type = 4 Then 
-		If ImagesCollide(monsterHonk,(new_monster\Pos_x)-movX,(new_monster\Pos_y)-movY,0,player,player_posx,player_posy,0) Then
-		player_Energy = player_Energy - 30
+ElseIf newMonster\sort = 4 Then 
+	If ImagesCollide(monsterHonk,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0) Then
+		playerEnergy = playerEnergy - 30
 		creditPoints = creditPoints - Rnd(10,30)
-		Delete new_monster.Monster
+		Delete newMonster.Monster
 	EndIf 
 	EndIf 
 Next
@@ -1803,387 +1768,337 @@ End Function
 
 
 Function DrawTeacher()
-	For new_teacher.teacher = Each Teacher
-		DrawImage teacher,(new_teacher\pos_x)-movX,(new_teacher\pos_y)-movY,new_teacher\frame
+	Local newTeacher.Teacher
+	For newTeacher.Teacher = Each Teacher
+		DrawImage(teacher,(newTeacher\posX)-movX,(newTeacher\posY)-movY,newTeacher\frame)
 	Next
 End Function 
-
 
 Function MoveTeacher()
-If moveAny <> 0
-
-	For new_teacher.teacher = Each Teacher
-		
-		If new_teacher\direction = 1 Then 
+	If(moveAny=0) Then Return
 	
-		If New_teacher\pos_x - New_teacher\Start_x <= 80 Then
-			
-				new_teacher\Pos_x = new_teacher\Pos_x +2
-				If new_teacher\Frame >3 Then new_teacher\Frame = 0
-				new_teacher\Anim_counter = new_teacher\Anim_counter -1
-				If new_teacher\Anim_counter = 0 Then
-					new_teacher\Anim_counter = 6
-					new_teacher\Frame = new_teacher\Frame +1
-					If new_teacher\Frame = 3 Then new_teacher\Frame = 0
+	Local newTeacher.Teacher
+	For newTeacher.Teacher = Each Teacher
+		If(newTeacher\direction=1) Then
+			If(newTeacher\posX-newTeacher\startX<=80) Then
+				newTeacher\posX = newTeacher\posX+2
+				If newTeacher\frame>3 Then newTeacher\frame = 0
+				newTeacher\animCounter = newTeacher\animCounter-1
+				If newTeacher\animCounter = 0 Then
+					newTeacher\animCounter = 6
+					newTeacher\frame = newTeacher\frame+1
+					If newTeacher\frame=3 Then newTeacher\frame = 0
 				EndIf
-		EndIf  	
-			If new_teacher\pos_x - new_teacher\start_x > 80 Then new_teacher\direction = 0
-
-		ElseIf new_teacher\direction = 0 Then 
-
-			If New_teacher\pos_x - new_teacher\start_x >= -80 Then
-			
-				new_teacher\Pos_x = new_teacher\Pos_x -2
-				If new_teacher\Frame <3 Then new_teacher\Frame = 3
-				new_teacher\Anim_counter = new_teacher\Anim_counter -1
-				If new_teacher\Anim_counter = 0 Then
-					new_teacher\Anim_counter = 6
-					new_teacher\Frame = new_teacher\Frame +1
-					If new_teacher\Frame > 5 Then new_teacher\Frame = 3
+			EndIf  	
+			If(newTeacher\posX-newTeacher\startX>80) Then newTeacher\direction = 0
+		ElseIf(newTeacher\direction=0) Then
+			If(newTeacher\posX-newTeacher\startX>=-80) Then
+				newTeacher\posX = newTeacher\posX-2
+				If(newTeacher\frame<3) Then newTeacher\frame = 3
+				newTeacher\animCounter = newTeacher\animCounter-1
+				If(newTeacher\animCounter=0) Then
+					newTeacher\animCounter = 6
+					newTeacher\frame = newTeacher\frame+1
+					If(newTeacher\frame>5) Then newTeacher\frame = 3
 				EndIf 
-				EndIf 
-			If New_teacher\pos_x - New_teacher\start_x < -80 Then new_teacher\direction = 1
-		EndIf 			
-		
-	Next
-	
-EndIf 
-End Function 
-
-
-Function TeacherTrade()
-If doTrade = 1 Then ;just after the first messages
-
-	If score >= 15 Then	;if player has enough money to deal
-		
-		For new_teacher.teacher = Each Teacher
-		If ImagesCollide(teacher,((new_teacher\pos_x)-movX),((new_teacher\pos_y)-movY),0,player,player_posx,player_posy,0) Then
-		moveAny = 0
-		player_move = 0
-		jumpAllow = 0
-		
-		Select nextStep
-		
-			Case 0		
-				point = (score - (score Mod 15))/15	;e.g. you have 43 coins, so you can get 8 points, 3 left
-				Text 0,15,"Du kannst dein Punktekonto um "+point+" Punkte auffüllen, wenn du willst."
-				If KeyHit(28) Then nextStep = nextStep +1
-				
-				
-			Case 1
-				Locate 0,30
-				choice$ = Trim$(Input$("Wenn du einverstanden bist, gib 'ja' ein, ansonsten 'nein'. (Bitte KLEIN schreiben!)"))
-				;WaitKey
-				If KeyHit(28) And choice >= 0 Then
-				nextStep = nextStep +1
-				EndIf 
-				 
-				 		
-			Case 2	
-				If Trim$(choice$) = "ja" Then
-				Text 0,15,"Du hast "+point+" Punkte hinzubekommen. - Ich muss jetzt mal verschwinden, sonst... ähm egal, also tschüss!"
-				
-				If KeyHit(28) Then
-				Delete new_teacher
-				text_var = text_var +1 ;this is only for the tutorial
-				moveAny = 1
-				player_move = 1
-				nextStep = 0			;reset for next time :)
-				score = score - (point*10)
-				creditPoints = creditPoints+point
-				jumpAllow = 1
-				Exit
-				EndIf 
-				
-				ElseIf Trim$(choice$) = "nein" Then
-				Text 0,15,"Na gut, dann eben nicht. Ich muss jetzt weg, äh... ins Lehrerzimmer."
-
-				If KeyHit(28) Then
-				Delete new_teacher
-				text_var = text_var +1
-				moveAny = 1
-				player_move = 1
-				nextStep = 0
-				jumpAllow = 1
-				Exit 
-				EndIf
-				
-				ElseIf Trim$(choice$) <> "ja" Or "nein" Then
-				Text 0,15,"Was soll denn '"+choice+"' sein? Du hast dich wohl verschrieben. Ich gehe jetzt. Überleg' dir deine Antwort nächstens besser!"
-
-				If KeyHit(28) Then
-				text_var = text_var +1
-				moveAny = 1
-				player_move = 1
-				nextStep = 0
-				jumpAllow = 1
-				Delete new_teacher
-				Exit
-				EndIf 
-				EndIf 
-		
-		End Select 
-		
+			EndIf 
+			If(newTeacher\posX-newTeacher\startX<-80) Then newTeacher\direction = 1
 		EndIf
-		Next			
-	
-	
-	ElseIf score < 15 Then
-
-	For new_teacher.teacher = Each Teacher
-	If ImagesCollide(teacher,((new_teacher\pos_x)-movX),((new_teacher\pos_y)-movY),0,player,player_posx,player_posy,0) Then
-	
-	Text 0,0,"Tut mir Leid, aber du hast nicht genug Geld, um mit mir zu handeln. Ich muss jetzt weg -äh... ins Lehrerzimmer."
-	Text 0,15,"Bitte Enter drücken."
-	
-	If KeyHit(28) Then
-	Delete new_teacher
-	text_var = text_var +1
-	moveAny = 1
-	Exit
-	EndIf
-	
-	EndIf
-	Next 
-			
-	EndIf		
-			
-EndIf			
-End Function 
-
-
-Function DrawSneak()
-	For new_sneak.sneak = Each Sneak
-		DrawImage sneak,((new_sneak\pos_x)-movX),((new_sneak\pos_y)-movY),new_sneak\frame
 	Next
 End Function
 
+Function TeacherTrade()
+	If(doTrade<>1) Then Return
+	;just after the first messages
+
+	If(score>=15) Then	;if player has enough money to deal
+		Local newTeacher.Teacher
+		For newTeacher.Teacher = Each Teacher
+			If(ImagesCollide(teacher,((newTeacher\posX)-movX),((newTeacher\posY)-movY),0,player,playerPosX,playerPosY,0)) Then
+				moveAny = 0
+				playerMove = 0
+				jumpAllow = 0
+				
+				Select nextStep
+					Case 0
+						point = (score - (score Mod 15))/15	;e.g. you have 43 Coin, so you can get 8 points, 3 left
+						Text(0,15,tradeText(0)+point+tradeText(1))
+						If(KeyHit(28)) Then nextStep = nextStep+1
+					Case 1
+						Locate(0,30)
+						choice$ = Trim$(Input$(tradeText(2)))
+						If(KeyHit(28) And choice>=0) Then nextStep = nextStep+1
+					Case 2
+						If(Trim$(choice$) = "ja") Then
+							Text(0,15,tradeText(3)+point+tradeText(4))
+							
+							If KeyHit(28) Then
+								Delete newTeacher
+								text_var = text_var +1 ;this is only for the tutorial
+								moveAny = 1
+								playerMove = 1
+								nextStep = 0			;reset for next time :)
+								score = score - (point*10)
+								creditPoints = creditPoints+point
+								jumpAllow = 1
+								Exit
+							EndIf
+						ElseIf(Trim$(choice$) = "nein") Then
+							Text(0,15,tradeText(5))
+							
+							If(KeyHit(28)) Then
+								Delete newTeacher
+								text_var = text_var+1
+								moveAny = 1
+								playerMove = 1
+								nextStep = 0
+								jumpAllow = 1
+								Exit 
+							EndIf
+						Else
+							Text(0,15,tradeText(6)+choice+tradeText(7))
+							
+							If(KeyHit(28)) Then
+								text_var = text_var+1
+								moveAny = 1
+								playerMove = 1
+								nextStep = 0
+								jumpAllow = 1
+								Delete newTeacher
+								Exit
+							EndIf 
+						EndIf
+				End Select
+			EndIf
+		Next
+	ElseIf(score<15) Then
+		For newTeacher.Teacher = Each Teacher
+			If(ImagesCollide(teacher,((newTeacher\posX)-movX),((newTeacher\posY)-movY),0,player,playerPosX,playerPosY,0)) Then
+				
+				Text(0,0,tradeText(8))
+				Text(0,15,tradeText(9))
+				
+				If(KeyHit(28)) Then
+					Delete newTeacher
+					text_var = text_var+1
+					moveAny = 1
+					Exit
+				EndIf
+			EndIf
+		Next
+	EndIf
+End Function 
+
+Function DrawSneak()
+	Local newSneak.Sneak
+	For newSneak.Sneak = Each Sneak
+		DrawImage(sneak,((newSneak\posX)-movX),((newSneak\posY)-movY),newSneak\frame)
+	Next
+End Function
 
 Function MoveSneak()
-If moveAny <> 0
-
-	For new_sneak.sneak = Each Sneak
-		
-		If New_sneak\direction = 1 Then 
-
-		If (new_sneak\pos_x - new_sneak\start_x <= 80) Then
-			
-				new_sneak\Pos_x = new_sneak\Pos_x +2
-				If new_sneak\Frame >3 Then new_sneak\Frame = 0
-				new_sneak\Anim_counter = new_sneak\Anim_counter -1
-				If new_sneak\Anim_counter = 0 Then
-					new_sneak\Anim_counter = 6
-					new_sneak\Frame = new_sneak\Frame +1
-					If new_sneak\Frame = 3 Then new_sneak\Frame = 0
+	If(moveAny<>0) Then
+		Local newSneak.Sneak
+		For newSneak.Sneak = Each Sneak
+			If(newSneak\direction=1) Then 
+				If(newSneak\posX-newSneak\startX<=80) Then
+					newSneak\posX = newSneak\posX +2
+					If(newSneak\frame>3) Then newSneak\frame = 0
+					newSneak\animCounter = newSneak\animCounter -1
+					If(newSneak\animCounter=0) Then
+						newSneak\animCounter = 6
+						newSneak\frame = newSneak\frame +1
+						If(newSneak\frame=3) Then newSneak\frame = 0
+					EndIf
 				EndIf
-		EndIf  
-				
-			If (new_sneak\pos_x - New_sneak\start_x) > 80 Then new_sneak\direction = 0
-
-		ElseIf new_sneak\direction = 0 Then 
-
-		If (new_sneak\pos_x - new_sneak\start_x >= -80) Then
-			
-				new_sneak\Pos_x = new_sneak\Pos_x -2
-				If new_sneak\Frame <3 Then new_sneak\Frame = 3
-				new_sneak\Anim_counter = new_sneak\Anim_counter -1
-				If new_sneak\Anim_counter = 0 Then
-					new_sneak\Anim_counter = 6
-					new_sneak\Frame = new_sneak\Frame +1
-					If new_sneak\Frame > 5 Then new_sneak\Frame = 3
+				If(newSneak\posX-newSneak\startX>80) Then newSneak\direction = 0
+			ElseIf(newSneak\direction=0) Then 
+				If(newSneak\posX-newSneak\startX>=-80) Then
+					newSneak\posX = newSneak\posX -2
+					If(newSneak\frame<3) Then newSneak\frame = 3
+					newSneak\animCounter = newSneak\animCounter-1
+					If(newSneak\animCounter=0) Then
+						newSneak\animCounter = 6
+						newSneak\frame = newSneak\frame+1
+						If(newSneak\frame>5) Then newSneak\frame = 3
+					EndIf 
 				EndIf 
-				EndIf 
-				If (new_sneak\pos_x - new_sneak\start_x < -80) Then new_sneak\direction = 1
-				EndIf 			
-		
-	Next
-	
-EndIf
-End Function 
-
+				If(newSneak\posX-newSneak\startX<-80) Then newSneak\direction = 1
+			EndIf 
+		Next
+	EndIf
+End Function
 
 Function SneakTrade()
-If doTrade = 1 Then
+	If(doTrade<>1) Then Return
 
-;attention: The sneak doesnt care if the player hay enough coins or not		
-		For new_sneak.sneak = Each Sneak
-		If ImagesCollide(sneak,((new_sneak\pos_x)-movX),((new_sneak\pos_y)-movY),0,player,player_posx,player_posy,0) Then
-		moveAny = 0
-		player_move = 0
-		jumpAllow = 0
+	;attention: sneak doesn't care if the player has enough coins or not
+	
+		Local newSneak.Sneak
+		For newSneak.Sneak = Each Sneak
+			If(ImagesCollide(sneak,((newSneak\posX)-movX),((newSneak\posY)-movY),0,player,playerPosX,playerPosY,0)) Then
+				moveAny = 0
+				playerMove = 0
+				jumpAllow = 0
 		
-			Select nextStep ;as in the text_var-funct., the steps are requested after each other
-			
-			Case 0 ;standard
-				point = 20; he always tells you that you get 20 poins!
-				Text 0,15,"Du kannst dein Punktekonto um "+point+" Punkte auffüllen, wenn du willst."
-				If KeyHit(28) Then nextStep = nextStep +1
-				
-			Case 1
-				Locate 0,30
-				choice$ = Trim$(Input$("Wenn du einverstanden bist, gib 'ja' oder was anderes ein, ansonsten 'nein'. (Bitte KLEIN schreiben!)"))
-				
-				If KeyHit(28) And choice >= 0 Then
-				nextStep = nextStep +1
-				EndIf 
-				
-			Case 2
-			
-			If Trim$(choice$) <> "nein" Then
-			Text 0,15,"Herr Schulleiter, Herr Schulleiter!! Ich hab einen Schüler gefunden, der mich bestechen wollte!"
-			Color 255,0,0
-			Text 0,30,"Für diesen Betrugsversuch werden dir 15 Punkte abgezogen. Außerdem verlierst du dein ganzes Geld."
-			Color 128,255,128
-			Text 0,45,"Tja, Pech gehabt! Bitte Enter drücken."
-			
-			If KeyHit(28) Then
-			score = 0
-			creditPoints = creditPoints - 15
-			text_var = text_var +1
-			moveAny = 1
-			player_move = 1
-			nextStep = 0
-			jumpAllow = 1
-			Delete new_sneak
-			Exit
+				Select nextStep ;as in the text_var-funct., the steps are requested after each other
+					Case 0 ;standard
+						point = Rnd(8,30); he tells you an arbitrary amount of points!
+						Text(0,15,tradeText(0)+point+tradeText(1))
+						If(KeyHit(28)) Then nextStep = nextStep+1
+					Case 1
+						Locate(0,30)
+						choice$ = Trim$(Input$(tradeText(2)))
+						
+						If(KeyHit(28) And choice>=0) Then nextStep = nextStep+1
+					Case 2
+						If(Trim$(choice$) <> "nein") Then
+							Text(0,15,tradeText(10))
+							Color(255,0,0)
+							Text(0,30,tradeText(11))
+							Color(128,255,128)
+							Text(0,45,tradeText(12))
+							
+							If(KeyHit(28)) Then
+								score = 0
+								creditPoints = creditPoints-15
+								text_var = text_var+1
+								moveAny = 1
+								playerMove = 1
+								nextStep = 0
+								jumpAllow = 1
+								Delete newSneak
+								Exit
+							EndIf
+						ElseIf(Trim$(choice$) = "nein") Then
+							Text(0,15,tradeText(13))
+							
+							If(KeyHit(28)) Then
+								text_var = text_var+1
+								moveAny = 1
+								playerMove = 1
+								nextStep = 0
+								jumpAllow = 1
+								Delete newSneak
+								Exit
+							EndIf
+						EndIf
+				End Select
 			EndIf
-			
-			ElseIf Trim$(choice$) = "nein" Then
-			Text 0,15,"Och menno, du hast mich schon wieder durchschaut. Aber warte - nächstes Mal krieg ich dich!"
-			
-			If KeyHit(28) Then
-			text_var = text_var +1
-			moveAny = 1
-			player_move = 1
-			nextStep = 0
-			jumpAllow = 1
-			Delete new_sneak
-			Exit
-			EndIf 
-			EndIf 
-			
-			End Select  
-			
-		EndIf
 		Next
-		
-EndIf 				
 End Function 
 
-
-Function DrawPause()
-	For newpause.pause = Each Pause
-		If newpause\sort = 1 Then
-			DrawImage eighthpause,(newpause\pos_x)-movX,(newpause\pos_y)-movY
-		ElseIf newpause\sort = 2 Then
-			DrawImage quarterpause,(newpause\pos_x)-movX,(newpause\pos_y)-movY
+Function DrawRest()
+	Local newRest.Rest
+	For newRest.Rest = Each Rest
+		If(newRest\sort=1) Then
+			DrawImage(eighthRest,(newRest\posX)-movX,(newRest\posY)-movY)
+		ElseIf(newRest\sort=2) Then
+			DrawImage(crotchetRest,(newRest\posX)-movX,(newRest\posY)-movY)
 		EndIf
 	Next	
 End Function 
- 
 
-Function PauseCollision()	
-	For newpause.pause = Each Pause
-		If ImagesCollide(eighthpause,(newpause\pos_x)-movX,(newpause\pos_y)-movY,0,player,player_posx,player_posy,0) Then
-			Delete newpause.pause
-			pauseTime = MilliSecs()
+Function RestCollision()
+	Local newRest.Rest
+	For newRest.Rest = Each Rest
+		If ImagesCollide(eighthRest,(newRest\posX)-movX,(newRest\posY)-movY,0,player,playerPosX,playerPosY,0) Then
+			Delete newRest.Rest
+			restTime = MilliSecs()
 			timeValue = 7500
-		ElseIf ImagesCollide(quarterpause,(newpause\pos_x)-movX,(newpause\pos_y)-movY,0,player,player_posx,player_posy,0) Then
-			Delete newpause.pause
-			pauseTime = MilliSecs()
+		ElseIf ImagesCollide(crotchetRest,(newRest\posX)-movX,(newRest\posY)-movY,0,player,playerPosX,playerPosY,0) Then
+			Delete newRest.Rest
+			restTime = MilliSecs()
 			timeValue = 15000
 		EndIf 
 	Next 
 End Function
 
-
 Function PlayerShoot()
-If moveAny <> 0 Then
-If shootAble = 1 Then 
-
-	If KeyHit(157) Then ; if ctrl-right is hit ==> change back to KeyDown!!
-	PlaySound throwBook
+	If(moveAny=0) Then Return
+	If(shootAble=0) Then Return
+	
+	If(KeyHit(157)) Then ; if ctrl-right is hit ==> change back to KeyDown!!
+		PlaySound(throwBook)
 		shootAble = 0
 		shootTime = MilliSecs()
-
-	If movingRight = 1 Then 
-		newbookright.ShootRight = New ShootRight
-		newbookright.shootRight\shoot_x = ((player_posx)+movX)+10
-		newbookright.shootRight\shoot_y = ((player_posy)+movY)
-
-	ElseIf movingRight = 0 Then
-		newbookleft.shootLeft = New ShootLeft
-		newbookleft.shootLeft\shoot_x = ((player_posx)+movX)-10
-		newbookleft.shootLeft\shoot_y = ((player_posy)+movY)
-	EndIf
+		
+		If(movingRight) Then 
+			Local newBookRight.ShootRight = New ShootRight
+			newBookRight.ShootRight\shootX = ((playerPosX)+movX)+10
+			newBookRight.ShootRight\shootY = ((playerPosY)+movY)
+		Else
+			Local newBookLeft.ShootLeft = New ShootLeft
+			newBookLeft.ShootLeft\shootX = ((playerPosX)+movX)-10
+			newBookLeft.ShootLeft\shootY = ((playerPosY)+movY)
+		EndIf
 	EndIf 
-EndIf 
-EndIf 
 End Function 
 
-
 Function DrawShoot()
-If moveAny <> 0 Then
-	For newbookright.shootRight = Each ShootRight
-		DrawImage book,(newbookright.shootRight\shoot_x)-movX,(newbookright.shootRight\shoot_y)-movY
-		newbookright\shoot_x = newbookright\shoot_x + 9
+	If(moveAny=0) Then Return
+	
+	Local newBookRight.ShootRight
+	For newBookRight.ShootRight = Each ShootRight
+		DrawImage(book,(newBookRight.ShootRight\shootX)-movX,(newBookRight.ShootRight\shootY)-movY)
+		newBookRight\shootX = newBookRight\shootX + 9
 	Next
-
-	For newbookleft.ShootLeft = Each ShootLeft
-		DrawImage book,(newbookleft.ShootLeft\shoot_x)-movX,(newbookleft.ShootLeft\shoot_y)-movY
-		newbookleft\shoot_x = newbookleft\shoot_x - 9
-	Next 
-EndIf 
+	
+	Local newBookLeft.ShootLeft
+	For newBookLeft.ShootLeft = Each ShootLeft
+		DrawImage(book,(newBookLeft.ShootLeft\shootX)-movX,(newBookLeft.ShootLeft\shootY)-movY)
+		newBookLeft\shootX = newBookLeft\shootX - 9
+	Next
 End Function 
 
 
 Function ShootCollision()
-For new_monster.Monster = Each Monster
-For newbookright.shootright = Each ShootRight
-	If ImagesCollide(book,((newbookright\shoot_x)-movX),((newbookright\shoot_y)-movY),0,monsterLazy,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookright.shootright
+	For newMonster.Monster = Each Monster
+	For newBookRight.shootright = Each ShootRight
+		If ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterLazy,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+			Delete newMonster.Monster
+		Delete newBookRight.shootright
 		PlaySound monsterDie
 		shootAble = 1 
-	ElseIf ImagesCollide(book,((newbookright\shoot_x)-movX),((newbookright\shoot_y)-movY),0,monsterNaughty,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookright.shootright
+	ElseIf ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterNaughty,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+		Delete newMonster.Monster
+		Delete newBookRight.shootright
 		PlaySound monsterDie
 		shootAble = 1
-	ElseIf ImagesCollide(book,((newbookright\shoot_x)-movX),((newbookright\shoot_y)-movY),0,monsterZero,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookright.shootright
+	ElseIf ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterZero,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+		Delete newMonster.Monster
+		Delete newBookRight.shootright
 		PlaySound monsterDie
 		shootAble = 1
-	ElseIf ImagesCollide(book,((newbookright\shoot_x)-movX),((newbookright\shoot_y)-movY),0,monsterHonk,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookright.shootright
+	ElseIf ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterHonk,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+		Delete newMonster.Monster
+		Delete newBookRight.shootright
 		PlaySound monsterDie
 		shootAble = 1
 	EndIf
 Next
 Next
 
-For new_monster.Monster = Each Monster
-For newbookleft.shootleft = Each ShootLeft
-	If ImagesCollide(book,((newbookleft\shoot_x)-movX),((newbookleft\shoot_y)-movY),0,monsterLazy,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookleft.shootleft
+For newMonster.Monster = Each Monster
+	For newBookLeft.shootleft = Each ShootLeft
+		If ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterLazy,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+			Delete newMonster.Monster
+		Delete newBookLeft.shootleft
 		PlaySound monsterDie
 		shootAble = 1 
-	ElseIf ImagesCollide(book,((newbookleft\shoot_x)-movX),((newbookleft\shoot_y)-movY),0,monsterNaughty,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookleft.shootleft
+	ElseIf ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterNaughty,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+		Delete newMonster.Monster
+		Delete newBookLeft.shootleft
 		PlaySound monsterDie
 		shootAble = 1
-	ElseIf ImagesCollide(book,((newbookleft\shoot_x)-movX),((newbookleft\shoot_y)-movY),0,monsterZero,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookleft.shootleft
+	ElseIf ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterZero,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+		Delete newMonster.Monster
+		Delete newBookLeft.shootleft
 		PlaySound monsterDie
 		shootAble = 1
-	ElseIf ImagesCollide(book,((newbookleft\shoot_x)-movX),((newbookleft\shoot_y)-movY),0,monsterHonk,((new_monster\Pos_x)-movX),((new_monster\Pos_y)-movY),0) Then
-		Delete new_monster.Monster
-		Delete newbookleft.shootleft
+	ElseIf ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterHonk,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
+		Delete newMonster.Monster
+		Delete newBookLeft.shootleft
 		PlaySound monsterDie
 		shootAble = 1
 	EndIf
@@ -2191,16 +2106,16 @@ Next
 Next
 
 ;if the book doesnt collide with any item, it will be deleted after 1,5 seconds!
-For newbookright.shootright = Each ShootRight
+For newBookRight.shootright = Each ShootRight
 	If (MilliSecs() - shootTime) > 1500 Then
-	Delete newbookright.shootright
+		Delete newBookRight.shootright
 	shootAble = 1
 	EndIf
 Next
 
-For newbookleft.shootleft = Each ShootLeft
+For newBookLeft.shootleft = Each ShootLeft
 	If (MilliSecs() - shootTime) > 1500 Then
-	Delete newbookleft.shootleft
+		Delete newBookLeft.shootleft
 	shootAble = 1
 	EndIf
 Next
@@ -2208,69 +2123,67 @@ End Function
 
 
 Function PlayerJump()
-If jumpAllow = 1 Then ; if player is not at the beginning of tutorial level 
+	If(jumpAllow<>1) Then Return	; if player is not at the beginning of tutorial level 
 
-	If KeyDown(57) Then
-		
-		If jump = False Then
-			jump = True
-			PlaySound jumpSound 
-			posy_temp = 18
+	If(KeyDown(57)) Then
+		If(jump=False) Then
+			jump=True
+			PlaySound(jumpSound)
+			posYTemp = 18
 		EndIf
 	EndIf ; otherwise, it would keep the player in the air
 	
 		;in Case of collision
-		If (actualLevel((player_posx+movX+12) /32,(player_posy+movY) /32)=1 Or actualLevel((player_posx+movX) /32,(player_posy+movY) /32)=1) And jump = True Then
+	If (currentLevel((playerPosX+movX+12) /32,(playerPosY+movY) /32)=1 Or currentLevel((playerPosX+movX) /32,(playerPosY+movY) /32)=1) And jump = True Then
 			jump = True
-			posy_temp = 0 
+			posYTemp = 0 
 		EndIf 
 
 		
 		
-		If jump = True Then
-			posy_temp = posy_temp - 1
-			movY = movY - posy_temp
-		EndIf
-		
-		If posy_temp <= 0 Then
-			If actualLevel((player_posx+movX+12) /32,(player_posy+movY+32) /32) = 1 Or actualLevel((player_posx+movX+20) /32,(player_posy+movY+32) /32) = 1 Then 
-				jump = False
-				temp_y = movY /32	;\
-				movY = temp_y *32	;/ sets the exact position of Player if he stands in a tile
-			EndIf
-		EndIf
-		
-		
-		If jump = False Then
-			If actualLevel((player_posx+movX+12) /32,(player_posy+movY+32) /32) = 0 Then	;if there is no brick above him
-				jump = True
-				posy_temp = 0
-			EndIf 
-		EndIf 
-		
-		If movY < -416 Then
-			movY = -416
-			jump=True
-			posy_temp = 0
-		EndIf
-		
-		If movY >= 480 Then 
-			movY = 480		; the max. value of Movy must be set!
+	If jump = True Then
+		posYTemp = posYTemp - 1
+		movY = movY - posYTemp
+	EndIf
+	
+	If posYTemp <= 0 Then
+		If currentLevel((playerPosX+movX+12) /32,(playerPosY+movY+32) /32) = 1 Or currentLevel((playerPosX+movX+20) /32,(playerPosY+movY+32) /32) = 1 Then 
 			jump = False
+			temp_y = movY /32	;\
+			movY = temp_y *32	;/ sets the exact position of Player if he stands in a tile
 		EndIf
-		
+	EndIf
+	
+	
+	If jump = False Then
+		If currentLevel((playerPosX+movX+12) /32,(playerPosY+movY+32) /32) = 0 Then	;if there is no brick above him
+			jump = True
+			posYTemp = 0
 		EndIf 
+	EndIf 
+	
+	If movY < -416 Then
+		movY = -416
+		jump=True
+		posYTemp = 0
+	EndIf
+	
+	If movY >= 480 Then 
+		movY = 480		; the max. value of Movy must be set!
+		jump = False
+	EndIf
+		
 End Function 
 
 Function LoadLevel(number)
-	Local newcoin.Coins
-	Local new_energy_object.Energys
-	Local newitem.School
-	Local new_less_energy_object.Less_energys
-	Local New_teacher.Teacher
-	Local New_sneak.Sneak
-	Local newdoor.Door
-	Local newpause.Pause
+	Local newCoin.Coin
+	Local newEnergyObject.Energy
+	Local newItem.School
+	Local newLessEnergyObject.LessEnergy
+	Local newTeacher.Teacher
+	Local newSneak.Sneak
+	Local newDoor.Door
+	Local newRest.Rest
 	
 	Local currentLine$
 	Local currentCommaPos
@@ -2278,92 +2191,92 @@ Function LoadLevel(number)
 	Select(number)
 		Case 1
 			stream = ReadFile("lvl/tut.lvl")
-			ReadLine(stream)	;coins heading
+			ReadLine(stream)	;Coin heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				newcoin.Coins = New Coins
-				newcoin\Coinx = Left(currentLine,4)
-				newcoin\Coiny = Mid(currentLine,6,3)
-				newcoin\Sort = Right(currentLine,1)
+				newCoin.Coin = New Coin
+				newCoin\coinX = Left(currentLine,4)
+				newCoin\coinY = Mid(currentLine,6,3)
+				newCoin\sort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;energy heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				new_energy_object.Energys = New Energys
-				new_energy_object\en_x = Left(currentLine,3)
-				new_energy_object\en_y = Mid(currentLine,5,3)
-				new_energy_object\sort = Right(currentLine,1)
+				newEnergyObject.Energy = New Energy
+				newEnergyObject\enX = Left(currentLine,3)
+				newEnergyObject\enY = Mid(currentLine,5,3)
+				newEnergyObject\sort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;items heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				newitem.School = New School
-				newitem\School_x = Left(currentLine,3)
-				newitem\School_y = Mid(currentLine,5,3)
-				newitem\School_sort = Right(currentLine,1)
+				newItem.School = New School
+				newItem\schoolX = Left(currentLine,3)
+				newItem\schoolY = Mid(currentLine,5,3)
+				newItem\schoolSort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;less energy heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				new_less_energy_object.Less_energys = New Less_energys
-				new_less_energy_object\less_en_x = Left(currentLine,3)
-				new_less_energy_object\less_en_y = Mid(currentLine,5,3)
-				new_less_energy_object\less_en_sort = Right(currentLine,1)
+				newLessEnergyObject.LessEnergy = New LessEnergy
+				newLessEnergyObject\lessEnX = Left(currentLine,3)
+				newLessEnergyObject\lessEnY = Mid(currentLine,5,3)
+				newLessEnergyObject\lessEnSort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;monster heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				new_monster.Monster = New Monster
-				new_monster\Monster_type = Left(currentLine,1)
-				new_monster\Pos_x = Mid(currentLine,3,4)
-				new_monster\Pos_y = Mid(currentLine,8,3)
-				new_monster\Direction = Mid(currentLine,12,1)
-				new_monster\Anim_counter = Mid(currentLine,14,1)
-				new_monster\Frame = Mid(currentLine,16,1)
-				new_monster\Start_x = Mid(currentLine,18,4)
-				new_monster\M_energy = Right(currentLine,3)
+				newMonster.Monster = New Monster
+				newMonster\sort = Left(currentLine,1)
+				newMonster\posX = Mid(currentLine,3,4)
+				newMonster\posY = Mid(currentLine,8,3)
+				newMonster\direction = Mid(currentLine,12,1)
+				newMonster\animCounter = Mid(currentLine,14,1)
+				newMonster\frame = Mid(currentLine,16,1)
+				newMonster\startX = Mid(currentLine,18,4)
+				newMonster\energy = Right(currentLine,3)
 			Forever
 			ReadLine(stream)	;teacher heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				New_teacher.Teacher = New Teacher
-				New_teacher\pos_x= Left(currentLine,4)
-				New_teacher\pos_y= Mid(currentLine,6,3)
-				New_teacher\frame = Mid(currentLine,10,1)
-				New_teacher\direction = Mid(currentLine,12,1)
-				New_teacher\anim_counter = Mid(currentLine,14,1)
-				New_teacher\start_x = Right(currentLine,4)
+				newTeacher.Teacher = New Teacher
+				newTeacher\posX= Left(currentLine,4)
+				newTeacher\posY= Mid(currentLine,6,3)
+				newTeacher\frame = Mid(currentLine,10,1)
+				newTeacher\direction = Mid(currentLine,12,1)
+				newTeacher\animCounter = Mid(currentLine,14,1)
+				newTeacher\startX = Right(currentLine,4)
 			Forever
 			ReadLine(stream)	;sneak heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				New_sneak.Sneak = New Sneak
-				New_sneak\pos_x = Left(currentLine,4)
-				New_sneak\pos_y = Mid(currentLine,6,3)
-				New_sneak\frame = Mid(currentLine,10,1)
-				New_sneak\direction = Mid(currentLine,12,1)
-				New_sneak\anim_counter = Mid(currentLine,14,1)
-				New_sneak\start_x = Right(currentLine,4)
+				newSneak.Sneak = New Sneak
+				newSneak\posX = Left(currentLine,4)
+				newSneak\posY = Mid(currentLine,6,3)
+				newSneak\frame = Mid(currentLine,10,1)
+				newSneak\direction = Mid(currentLine,12,1)
+				newSneak\animCounter = Mid(currentLine,14,1)
+				newSneak\startX = Right(currentLine,4)
 			Forever
 			ReadLine(stream)	;level door heading
 			currentLine$ = ReadLine(stream)
-			newdoor.Door = New Door
-			newdoor\pos_x = Left(currentLine,4)
-			newdoor\pos_y = Mid(currentLine,6,3)
-			newdoor\frame = Right(currentLine,1)
+			newDoor.Door = New Door
+			newDoor\posX = Left(currentLine,4)
+			newDoor\posY = Mid(currentLine,6,3)
+			newDoor\frame = Right(currentLine,1)
 			ReadLine(stream)	;empty
 			ReadLine(stream)	;bricks heading
-			For bricky = 0 To 24
+			For brickY = 0 To 24
 				currentLine$ = ReadLine(stream)
-				For brickx = 0 To 181
-					actualLevel(brickx,bricky) = Mid(currentLine,(brickx+1)*2-1,1)
+				For brickX = 0 To 181
+					currentLevel(brickX,brickY) = Mid(currentLine,(brickX+1)*2-1,1)
 				Next
 			Next
 			CloseFile(stream)
@@ -2376,99 +2289,99 @@ Function LoadLevel(number)
 			EndIf 
 			
 			stream = ReadFile("lvl/"+(number+1)+".lvl")
-			ReadLine(stream)	;coins heading
+			ReadLine(stream)	;Coin heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				newcoin.Coins = New Coins
-				newcoin\Coinx = Left(currentLine,currentCommaPos-1)
-				newcoin\Coiny = Mid(currentLine,currentCommaPos+1,3)
-				newcoin\Sort = Right(currentLine,1)
+				newCoin.Coin = New Coin
+				newCoin\coinX = Left(currentLine,currentCommaPos-1)
+				newCoin\coinY = Mid(currentLine,currentCommaPos+1,3)
+				newCoin\sort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;energy heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				new_energy_object.Energys = New Energys
-				new_energy_object\en_x = Left(currentLine,currentCommaPos-1)
-				new_energy_object\en_y = Mid(currentLine,currentCommaPos+1,3)
-				new_energy_object\sort = Right(currentLine,1)
+				newEnergyObject.Energy = New Energy
+				newEnergyObject\enX = Left(currentLine,currentCommaPos-1)
+				newEnergyObject\enY = Mid(currentLine,currentCommaPos+1,3)
+				newEnergyObject\sort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;items heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				newitem.School = New School
-				newitem\School_x = Left(currentLine,currentCommaPos-1)
-				newitem\School_y = Mid(currentLine,currentCommaPos+1,3)
+				newItem.School = New School
+				newItem\schoolX = Left(currentLine,currentCommaPos-1)
+				newItem\schoolY = Mid(currentLine,currentCommaPos+1,3)
 				currentCommaPos = Instr(currentLine,",",currentCommaPos+1)
-				newitem\School_sort = Mid(currentLine,currentCommaPos+1)
+				newItem\schoolSort = Mid(currentLine,currentCommaPos+1)
 			Forever
 			ReadLine(stream)	;less energy heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				new_less_energy_object.Less_energys = New Less_energys
-				new_less_energy_object\less_en_x = Left(currentLine,currentCommaPos-1)
-				new_less_energy_object\less_en_y = Mid(currentLine,currentCommaPos+1,3)
-				new_less_energy_object\less_en_sort = Right(currentLine,1)
+				newLessEnergyObject.LessEnergy = New LessEnergy
+				newLessEnergyObject\lessEnX = Left(currentLine,currentCommaPos-1)
+				newLessEnergyObject\lessEnY = Mid(currentLine,currentCommaPos+1,3)
+				newLessEnergyObject\lessEnSort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;monster heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				new_monster.Monster = New Monster
-				new_monster\Monster_type = Left(currentLine,1)
-				new_monster\Pos_x = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				newMonster.Monster = New Monster
+				newMonster\sort = Left(currentLine,1)
+				newMonster\posX = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
 				currentCommaPos = Instr(currentLine,",",currentCommaPos+1)
-				new_monster\Pos_y = Mid(currentLine,currentCommaPos+1,3)
-				new_monster\Direction = Mid(currentLine,currentCommaPos+5,1)
-				new_monster\Anim_counter = Mid(currentLine,currentCommaPos+7,1)
-				new_monster\Frame = Mid(currentLine,currentCommaPos+9,1)
-				new_monster\Start_x = Mid(currentLine,currentCommaPos+11,Instr(currentLine,",",currentCommaPos+1))
-				new_monster\M_energy = Right(currentLine,3)
+				newMonster\posY = Mid(currentLine,currentCommaPos+1,3)
+				newMonster\direction = Mid(currentLine,currentCommaPos+5,1)
+				newMonster\animCounter = Mid(currentLine,currentCommaPos+7,1)
+				newMonster\frame = Mid(currentLine,currentCommaPos+9,1)
+				newMonster\startX = Mid(currentLine,currentCommaPos+11,Instr(currentLine,",",currentCommaPos+1))
+				newMonster\energy = Right(currentLine,3)
 			Forever
 			ReadLine(stream)	;teacher heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				New_teacher.Teacher = New Teacher
-				New_teacher\pos_x = Left(currentLine,4)
-				New_teacher\pos_y = Mid(currentLine,5,3)
-				New_teacher\frame = Mid(currentLine,9,1)
-				New_teacher\direction = Mid(currentLine,11,1)
-				New_teacher\anim_counter = Mid(currentLine,13,1)
-				New_teacher\start_x = Right(currentLine,4)
+				newTeacher.Teacher = New Teacher
+				newTeacher\posX = Left(currentLine,4)
+				newTeacher\posY = Mid(currentLine,5,3)
+				newTeacher\frame = Mid(currentLine,9,1)
+				newTeacher\direction = Mid(currentLine,11,1)
+				newTeacher\animCounter = Mid(currentLine,13,1)
+				newTeacher\startX = Right(currentLine,4)
 			Forever
 			ReadLine(stream)	;sneak heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
-				New_sneak.Sneak = New Sneak
-				New_sneak\pos_x = Left(currentLine,4)
-				New_sneak\pos_y = Mid(currentLine,5,3)
-				New_sneak\frame = Mid(currentLine,9,1)
-				New_sneak\direction = Mid(currentLine,11,1)
-				New_sneak\anim_counter = Mid(currentLine,13,1)
-				New_sneak\start_x = Right(currentLine,4)
+				newSneak.Sneak = New Sneak
+				newSneak\posX = Left(currentLine,4)
+				newSneak\posY = Mid(currentLine,5,3)
+				newSneak\frame = Mid(currentLine,9,1)
+				newSneak\direction = Mid(currentLine,11,1)
+				newSneak\animCounter = Mid(currentLine,13,1)
+				newSneak\startX = Right(currentLine,4)
 			Forever
 			ReadLine(stream)	;level door heading
 			currentLine$ = ReadLine(stream)
-			newdoor.Door = New Door
-			newdoor\pos_x = Left(currentLine,4)
-			newdoor\pos_y = Mid(currentLine,6,3)
-			newdoor\frame = Right(currentLine,1)
+			newDoor.Door = New Door
+			newDoor\posX = Left(currentLine,4)
+			newDoor\posY = Mid(currentLine,6,3)
+			newDoor\frame = Right(currentLine,1)
 			ReadLine(stream)	;empty
 			ReadLine(stream)	;bricks heading
-			For bricky = 0 To 24
+			For brickY = 0 To 24
 				currentLine$ = ReadLine(stream)
-				For brickx = 0 To 181
-					actualLevel(brickx,bricky) = Mid(currentLine,(brickx+1)*2-1,1)
+				For brickX = 0 To 181
+					currentLevel(brickX,brickY) = Mid(currentLine,(brickX+1)*2-1,1)
 				Next
 			Next
 			CloseFile(stream)
@@ -2486,72 +2399,72 @@ Function LoadLevel(number)
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				new_energy_object.Energys = New Energys
-				new_energy_object\en_x = Left(currentLine,currentCommaPos-1)
-				new_energy_object\en_y = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
-				new_energy_object\sort = Right(currentLine,1)
+				newEnergyObject.Energy = New Energy
+				newEnergyObject\enX = Left(currentLine,currentCommaPos-1)
+				newEnergyObject\enY = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				newEnergyObject\sort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;item heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				newitem.School = New School
-				newitem\School_x = Left(currentLine,currentCommaPos-1)
-				newitem\School_y = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
-				newitem\School_sort = Right(currentLine,2)
+				newItem.School = New School
+				newItem\schoolX = Left(currentLine,currentCommaPos-1)
+				newItem\schoolY = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				newItem\schoolSort = Right(currentLine,2)
 			Forever
 			ReadLine(stream)	;less energy heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				new_less_energy_object.Less_energys = New Less_energys
-				new_less_energy_object\less_en_x = Left(currentLine,currentCommaPos-1)
-				new_less_energy_object\less_en_y = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
-				new_less_energy_object\less_en_sort = Right(currentLine,1)
+				newLessEnergyObject.LessEnergy = New LessEnergy
+				newLessEnergyObject\lessEnX = Left(currentLine,currentCommaPos-1)
+				newLessEnergyObject\lessEnY = Mid(currentLine,currentCommaPos+1,Instr(currentLine,",",currentCommaPos+1))
+				newLessEnergyObject\lessEnSort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;monster heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				new_monster.Monster = New Monster
-				new_monster\Monster_type = Left(currentLine,1)
-				new_monster\Pos_x = Mid(currentLine,3,currentCommaPos-1)
-				new_monster\Pos_y = Mid(currentLine,currentCommaPos+1,3)
-				new_monster\Direction = Mid(currentLine,currentCommaPos+6,1)
-				new_monster\Anim_counter = Mid(currentLine,currentCommaPos+8,1)
-				new_monster\Frame = Mid(currentLine,currentCommaPos+10,1)
-				new_monster\Start_x = Mid(currentLine,currentCommaPos+12,Len(currentLine)-(currentCommaPos+12)-4)
-				new_monster\M_energy = Right(currentLine,3)
+				newMonster.Monster = New Monster
+				newMonster\sort = Left(currentLine,1)
+				newMonster\posX = Mid(currentLine,3,currentCommaPos-1)
+				newMonster\posY = Mid(currentLine,currentCommaPos+1,3)
+				newMonster\direction = Mid(currentLine,currentCommaPos+6,1)
+				newMonster\animCounter = Mid(currentLine,currentCommaPos+8,1)
+				newMonster\frame = Mid(currentLine,currentCommaPos+10,1)
+				newMonster\startX = Mid(currentLine,currentCommaPos+12,Len(currentLine)-(currentCommaPos+12)-4)
+				newMonster\energy = Right(currentLine,3)
 			Forever
 			ReadLine(stream)	;rest heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				newpause.Pause = New Pause
-				newpause\pos_x = Left(currentLine,currentCommaPos-1)
-				newpause\pos_y = Mid(currentLine,currentCommaPos+1,3)
-				newpause\sort = Right(currentLine,1)
+				newRest.Rest = New Rest
+				newRest\posX = Left(currentLine,currentCommaPos-1)
+				newRest\posY = Mid(currentLine,currentCommaPos+1,3)
+				newRest\sort = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;level door heading
 			Repeat
 				currentLine$ = ReadLine(stream)
 				If(currentLine$="") Then Exit
 				currentCommaPos = Instr(currentLine,",")
-				newdoor.Door = New Door
-				newdoor\pos_x = Left(currentLine,currentCommaPos-1)
-				newdoor\pos_y = Mid(currentLine,currentCommaPos+1,3)
-				newdoor\frame = Right(currentLine,1)
+				newDoor.Door = New Door
+				newDoor\posX = Left(currentLine,currentCommaPos-1)
+				newDoor\posY = Mid(currentLine,currentCommaPos+1,3)
+				newDoor\frame = Right(currentLine,1)
 			Forever
 			ReadLine(stream)	;empty
 			ReadLine(stream)	;bricks heading
-			For bricky = 0 To 24
+			For brickY = 0 To 24
 				currentLine$ = ReadLine(stream)
-				For brickx = 0 To 181
-					actualLevel(brickx,bricky) = Mid(currentLine,(brickx+1)*2-1,1)
+				For brickX = 0 To 181
+					currentLevel(brickX,brickY) = Mid(currentLine,(brickX+1)*2-1,1)
 				Next
 			Next
 			CloseFile(stream)
@@ -2624,29 +2537,26 @@ Function ShowAbi()
 
 End Function 
 
-
 Function TextTutorial()
-
 	SetFont(tutFont)
 	Color(200,200,0)
+	
+	If(doTut<>1) Then Return
 
 	;start the level
-
-	If(doTut = 1) Then		;if this tutorial is meant to be played
-		Select text_var
-
-		Case 0 ; the first text
+	Select text_var
+		Case 0 ;the first text
 			tut = 1
-			jumpAllow = 0 ; player is not able to jump
+			jumpAllow = 0 ;player is not able to jump
 			moveAny = 0
-		
+			
 			Text(10,30,tutText(0))
 			Text(10,45,tutText(1))
 			Text(10,60,tutText(2))
 			Text(10,75,tutText(3))
 			
 			If(KeyHit(28)) Then
-				;player_move = 1 ==> just after the last text
+				;playerMove = 1 ==> just after the last text
 				text_var = text_var+1
 			EndIf
 		Case 1
@@ -2679,17 +2589,17 @@ Function TextTutorial()
 			
 			If KeyHit(28) Then
 				text_var = text_var+1
-				player_move = 1
+				playerMove = 1
 			EndIf
 		;now he walks to the root
 		Case 5
 			tut = 1
 			
-			Local newitem.School
-			For newitem.School = Each School
-				If(ImagesCollide(root,((newitem\School_x)-movX),((newitem\School_y)-movY),0,player,player_posx,player_posy,0)) Then
+			Local newItem.School
+			For newItem.School = Each School
+				If(ImagesCollide(root,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0)) Then
 				didCollide = 1
-				player_move = 0
+				playerMove = 0
 				Text(10,30,tutText(15))
 				Text(10,45,tutText(16))
 				Text(10,60,tutText(17))
@@ -2700,7 +2610,7 @@ Function TextTutorial()
 			
 			If(KeyHit(28) And didCollide) Then
 				text_var = text_var+1
-				player_move = 1
+				playerMove = 1
 				tut = 0
 				didCollide = 0
 			EndIf
@@ -2709,10 +2619,11 @@ Function TextTutorial()
 		Case 6
 			tut = 1
 			
-			For new_energy_object.energys = Each Energys
-				If(ImagesCollide(sandwich,((new_energy_object\en_x)-movX),((new_energy_object\en_y)-movY),0,player,player_posx,player_posy,0)) Then
+			Local newEnergyObject.Energy
+			For newEnergyObject.Energy = Each Energy
+				If(ImagesCollide(sandwich,((newEnergyObject\enX)-movX),((newEnergyObject\enY)-movY),0,player,playerPosX,playerPosY,0)) Then
 					didCollide = 1
-					player_move = 0
+					playerMove = 0
 					Text(10,30,tutText(20))
 					Text(10,45,tutText(21))
 					Text(10,60,tutText(22))
@@ -2722,17 +2633,18 @@ Function TextTutorial()
 			
 			If(KeyHit(28) And didCollide) Then
 				text_var = text_var+1
-				player_move = 1
+				playerMove = 1
 				tut = 0
 				didCollide = 0
 			EndIf
 		Case 7
 			tut = 1
 			
-			For new_less_energy_object.less_energys = Each Less_energys
-				If(ImagesCollide(toilet,((new_less_energy_object\less_en_x)-movX),((new_less_energy_object\less_en_y)-movY),0,player,player_posx,player_posy,0)) Then
+			Local newLessEnergyObject.LessEnergy
+			For newLessEnergyObject.LessEnergy = Each LessEnergy
+				If(ImagesCollide(toilet,((newLessEnergyObject\lessEnX)-movX),((newLessEnergyObject\lessEnY)-movY),0,player,playerPosX,playerPosY,0)) Then
 					didCollide = 1
-					player_move = 0
+					playerMove = 0
 					Text(10,30,tutText(24))
 					Text(10,45,tutText(25))
 					Text(10,60,tutText(26))
@@ -2756,7 +2668,7 @@ Function TextTutorial()
 			
 			If(KeyHit(28)) Then
 				text_var = text_var+1
-				player_move = 1
+				playerMove = 1
 				tut = 0
 				moveAny = 1
 			EndIf
@@ -2765,7 +2677,7 @@ Function TextTutorial()
 			
 			If(movX = 712) Then
 				didCollide = 1 		;this is a few metres behind the 1st monster
-				player_move = 0
+				playerMove = 0
 				moveAny = 0
 				Text(10,30,tutText(33))
 				Text(10,45,tutText(34))
@@ -2774,7 +2686,7 @@ Function TextTutorial()
 			
 			If(KeyHit(28) And didCollide) Then
 				text_var = text_var +1
-				player_move = 1
+				playerMove = 1
 				moveAny = 1
 				didCollide = 0
 				movX = 716 			; he must be placed behind the orig. pos. else he repeats it always!
@@ -2782,7 +2694,7 @@ Function TextTutorial()
 		Case 10
 			If(movX = 1012) Then		;this is a few metres behind the 2nd monster
 				didCollide = 1
-				player_move = 0
+				playerMove = 0
 				Text(10,30,tutText(36))
 				Text(10,45,tutText(37))
 				Text(10,60,tutText(38))
@@ -2800,13 +2712,13 @@ Function TextTutorial()
 			
 			If(KeyHit(28)) Then
 				text_var = text_var+1
-				player_move = 1
+				playerMove = 1
 				didCollide = 0
 				jumpAllow = 1
 			EndIf 
 		Case 12
 			If(movX = 1664) Then 
-				player_move = 0
+				playerMove = 0
 				didCollide = 1
 				moveAny = 0
 				jumpAllow = 0
@@ -2816,19 +2728,20 @@ Function TextTutorial()
 			EndIf 
 		
 			If KeyHit(28) And didCollide Then
-				text_var = text_var +1
-				player_move = 1
+				text_var = text_var+1
+				playerMove = 1
 				moveAny = 1
 				jumpAllow = 1
 			EndIf
 		Case 13
-			For new_teacher.teacher = Each Teacher
-				If(ImagesCollide(teacher,((New_teacher\pos_x)-movX),((New_teacher\pos_y)-movY),0,player,player_posx,player_posy,0)) Then
+			Local newTeacher.Teacher
+			For newTeacher.Teacher = Each Teacher
+				If(ImagesCollide(teacher,((newTeacher\posX)-movX),((newTeacher\posY)-movY),0,player,playerPosX,playerPosY,0)) Then
 					doTrade = 0
 					moveAny = 0
 					jumpAllow = 0
 					didCollide = 1
-					player_move = 0
+					playerMove = 0
 					Text(10,30,tutText(44))
 					Text(10,45,tutText(45))
 					Text(10,60,tutText(46))
@@ -2842,7 +2755,7 @@ Function TextTutorial()
 		Case 14
 		;in this case, the player is dealing with the teacher. If the deal is over, the Text_var is raised in the TeacherTrade-Function.
 		Case 15
-			player_move = 0
+			playerMove = 0
 			moveAny = 0
 			Text(10,30,tutText(47))
 			Text(10,45,tutText(48))
@@ -2850,20 +2763,21 @@ Function TextTutorial()
 			
 			If(KeyHit(28)) Then
 				text_var = text_var+1
-				player_move = 1
+				playerMove = 1
 				didCollide = 0
 				moveAny = 1
 				jumpAllow = 1
 				doTrade = 0
 			EndIf 
 		Case 16
-			For new_sneak.sneak = Each Sneak
-				If(ImagesCollide(sneak,((New_sneak\pos_x)-movX),((new_sneak\pos_y)-movY),0,player,player_posx,player_posy,0)) Then
+			Local newSneak.Sneak
+			For newSneak.Sneak = Each Sneak
+				If(ImagesCollide(sneak,((newSneak\posX)-movX),((newSneak\posY)-movY),0,player,playerPosX,playerPosY,0)) Then
 					nextStep = 0 ; this is just for that the variable can be used
 					moveAny = 0
 					jumpAllow = 0
 					didCollide = 1
-					player_move = 0
+					playerMove = 0
 					Text(10,30,tutText(50))
 					Text(10,45,tutText(51))
 					Text(10,60,tutText(52))
@@ -2879,19 +2793,19 @@ Function TextTutorial()
 		Case 17
 		;see SneakTrade
 		Case 18
-			player_move = 0
+			playerMove = 0
 			moveAny = 0
 			Text(10,30,tutText(55))
 			
 			If(KeyHit(28)) Then
-				player_move = 1
+				playerMove = 1
 				moveAny = 1
 				text_var = text_var+1 
 				jumpAllow = 1
 			EndIf 
 		Case 19
 			If(movX = 2184) Then 
-				player_move = 0
+				playerMove = 0
 				Text(10,30,tutText(56))
 				Text(10,45,tutText(57))
 				Text(10,60,tutText(59))
@@ -2899,16 +2813,14 @@ Function TextTutorial()
 			EndIf 
 			
 			If(KeyHit(28)) Then
-				player_move = 1
+				playerMove = 1
 				moveAny = 1
 				doTrade = 1
 				text_var = text_var +1 
 				score = 0
-				player_Energy = 100
+				playerEnergy = 100
 			EndIf 
-	End Select
-EndIf   
-
+	End Select 
 End Function 
 
 Function TextAbitur()
@@ -2949,17 +2861,17 @@ Function TextAbitur()
 		level = level+1
 		doDrawPlayer = 1
 		moveAny = 1
-		player_move = 1
+		playerMove = 1
 		lives = 3 ; for this level, player has 3 chances!
 		;delete old stuff from level tutorial
-		Delete Each Coins
-		Delete Each Energys
+		Delete Each Coin
+		Delete Each Energy
 		Delete Each School
-		Delete Each Less_energys
+		Delete Each LessEnergy
 		Delete Each Monster
 		Delete Each Teacher
 		Delete Each Sneak
-		Delete Each Pause
+		Delete Each Rest
 		Delete Each Door
 		ResumeChannel(backGround)
 	EndIf 
@@ -2969,67 +2881,52 @@ Function WriteScore()
 	If (level <> 6) And (level < 9) Then
 		Text 570,0,"Punkte: "+creditPoints
 		Text 570,15,"Geld: "+score+" Euro"
-		Text 570,30,"Energie: "+player_Energy+"%"
+		Text 570,30,"Energie: "+playerEnergy+"%"
 		Text 570,45,"Leben: "+lives
 		Text 280,0,"mindestens benötigte Punkte: "+pointMinimum
 	EndIf 
 End Function 
 
 Function DrawLevelDoor()
-	If creditPoints >= pointMinimum Then
-	For newdoor.door = Each Door
-		DrawImage door,((newdoor\pos_x)-movX),((newdoor\pos_y)-movY),newdoor\frame
-	Next
-	ElseIf creditPoints < pointMinimum Then
-	For newdoor.door = Each Door
-		DrawImage door,((newdoor\pos_x)-movX),((newdoor\pos_y)-movY),0
-	Next
+	If(creditPoints >= pointMinimum) Then
+		Local newDoor.Door
+		For newDoor.Door = Each Door
+			DrawImage(door,((newDoor\posX)-movX),((newDoor\posY)-movY),newDoor\frame)
+		Next
+		ElseIf creditPoints < pointMinimum Then
+			For newDoor.Door = Each Door
+				DrawImage(door,((newDoor\posX)-movX),((newDoor\posY)-movY),0)
+		Next
 	EndIf 
 End Function 
 
 Function LevelDoorCollision()
-	For newdoor.door = Each Door
-		If ImagesCollide(door,((newdoor\pos_x)-movX),((newdoor\pos_y)-movY),0,player,player_posx,player_posy,0) Then
-			If creditPoints >= pointMinimum Then ; if player has enough coins to finish that level
+	Local newDoor.Door
+	For newDoor.Door = Each Door
+		If ImagesCollide(door,((newDoor\posX)-movX),((newDoor\posY)-movY),0,player,playerPosX,playerPosY,0) Then
+			If creditPoints >= pointMinimum Then ; if player has enough Coin to finish that level
 				PauseChannel backGround
 				Delay 500
 				;delete the stuff of the level before
-				For newcoin.Coins = Each Coins
-					Delete newcoin.Coins
-				Next
-				For new_energy_object.energys = Each Energys
-					Delete New_energy_object.energys
-				Next
-				For newitem.school = Each School
-					Delete newitem.school
-				Next
-				For new_less_energy_object.less_energys = Each Less_energys
-					Delete new_less_energy_object.less_energys
-				Next
-				For new_monster.Monster = Each Monster
-					Delete new_monster.Monster
-				Next
-				For new_teacher.teacher = Each Teacher
-					Delete new_teacher.teacher
-				Next
-				For new_sneak.sneak = Each Sneak
-					Delete new_sneak.sneak
-				Next
-				For new_pause.pause = Each Pause
-					Delete new_pause.pause
-				Next
-				PlaySound levelChange
+				Delete Each Coin
+				Delete Each Energy
+				Delete Each School
+				Delete Each LessEnergy
+				Delete Each Monster
+				Delete Each Teacher
+				Delete Each Sneak
+				Delete Each Rest
+				PlaySound(levelChange)
 				
 				level = level+1
-				Delete newdoor.door
-				Exit 
+				Delete newDoor.Door
+				Exit
 			ElseIf(creditPoints<pointMinimum) Then
 				Text(10,30,"Du hast leider noch nicht genug Punkte, um weiter zu kommen. Gehe nochmal zurück oder drücke F10 zum Neustarten.")
 			EndIf
 		EndIf 
 	Next  
 End Function 
-
 
 Function ShowMessages()
 	SetFont normFont ; change the font
@@ -3062,48 +2959,47 @@ Function Cheat()
 			Case "Leben"
 				lives = lives+100
 			Case "Energie"
-				player_Energy = player_Energy+100
+				playerEnergy = playerEnergy+100
 			Case "Punkte"
 				creditPoints = creditPoints+100
 			Case "Geld"
 				score = score+100
 			Case "Level+"
-				Delete Each Coins
-				Delete Each Energys
+				Delete Each Coin
+				Delete Each Energy
 				Delete Each School
-				Delete Each Less_energys
+				Delete Each LessEnergy
 				Delete Each Monster
 				Delete Each Teacher
 				Delete Each Sneak
 				Delete Each Door
-				player_move = 1
+				playerMove = 1
 				moveAny = 1
 				jumpAllow = 1
 				doTut = 0
 				tut = 0
-				player_Energy = 100
+				playerEnergy = 100
 				level = level+1
 			Case "Level-"
-				Delete Each Coins
-				Delete Each Energys
+				Delete Each Coin
+				Delete Each Energy
 				Delete Each School
-				Delete Each Less_energys
+				Delete Each LessEnergy
 				Delete Each Monster
 				Delete Each Teacher
 				Delete Each Sneak
 				Delete Each Door
-				player_move = 1
+				playerMove = 1
 				moveAny = 1
 				jumpAllow = 1
 				doTut = 0
 				tut = 0
-				player_Energy = 100
+				playerEnergy = 100
 				level = level-1
 		End Select
 		EndIf
 	EndIf 
 End Function 
-
 
 Function SelectBackGround()
 	If(KeyHit(2)) Then ClsColor(255,0,0)
@@ -3117,89 +3013,64 @@ Function SelectBackGround()
 	If(KeyHit(10)) Then ClsColor(Rnd(0,255),Rnd(0,255),Rnd(0,255))
 End Function 
 
-
 Function SaveGame()
 	If(KeyHit(64)) Then	;if F6 hit
-		If(FileType("Save.dat")=1) Then
-			SaveData = OpenFile("Save.dat")
-			WriteInt(SaveData,level)
-			If(start = 0) Then
-				WriteInt(SaveData,(start+1))
+		stream = WriteFile("savegame.dat")
+		WriteInt(stream,level)
+		If(FileType("savegame.dat")=1) Then
+			If(start=0) Then
+				WriteInt(stream,(start+1))
 			Else 
-				WriteInt(SaveData,(start-1))
+				WriteInt(stream,(start-1))
 			EndIf
-			WriteInt(SaveData,doTrade)
-			WriteInt(SaveData,nextStep)
-			WriteInt(SaveData,point)
-			WriteInt(SaveData,moveAny)
-			WriteInt(SaveData,PlayerMove)
-			WriteInt(SaveData,player_Energy)
-			WriteInt(SaveData,score)
-			WriteInt(SaveData,lives)
-			WriteInt(SaveData,creditPoints)
-			WriteInt(SaveData,pointMinimum)
-			WriteInt(SaveData,jumpAllow)
-			WriteInt(SaveData,tut)
-			WriteInt(SaveData,text_var)
-			WriteInt(SaveData,doTut)
-			WriteInt(SaveData,doDrawPlayer)
-			WriteInt(SaveData,movX)
-			WriteInt(SaveData,movY)
-		CloseFile(SaveData)
-
 		Else
-			SaveData = WriteFile("Save.dat")
-			WriteInt(SaveData,level)
-			WriteInt(SaveData,start)
-			WriteInt(SaveData,doTrade)
-			WriteInt(SaveData,nextStep)
-			WriteInt(SaveData,point)
-			WriteInt(SaveData,moveAny)
-			WriteInt(SaveData,PlayerMove)
-			WriteInt(SaveData,player_Energy)
-			WriteInt(SaveData,score)
-			WriteInt(SaveData,lives)
-			WriteInt(SaveData,creditPoints)
-			WriteInt(SaveData,pointMinimum)
-			WriteInt(SaveData,jumpAllow)
-			WriteInt(SaveData,tut)
-			WriteInt(SaveData,text_var)
-			WriteInt(SaveData,doTut)
-			WriteInt(SaveData,doDrawPlayer)
-			WriteInt(SaveData,movX)
-			WriteInt(SaveData,movY)
-			CloseFile(SaveData)
+			WriteInt(stream,start)
 		EndIf
+		WriteInt(stream,doTrade)
+		WriteInt(stream,nextStep)
+		WriteInt(stream,point)
+		WriteInt(stream,moveAny)
+		WriteInt(stream,PlayerMove)
+		WriteInt(stream,playerEnergy)
+		WriteInt(stream,score)
+		WriteInt(stream,lives)
+		WriteInt(stream,creditPoints)
+		WriteInt(stream,pointMinimum)
+		WriteInt(stream,jumpAllow)
+		WriteInt(stream,tut)
+		WriteInt(stream,text_var)
+		WriteInt(stream,doTut)
+		WriteInt(stream,doDrawPlayer)
+		WriteInt(stream,movX)
+		WriteInt(stream,movY)
+		CloseFile(stream)
 	EndIf 
 End Function
 
-
 Function LoadGame()
-	If KeyHit(63) Then
-		If FileType("Save.dat") = 1 Then
-			LoadData = ReadFile("Save.dat")
-			level = ReadInt(LoadData)
-			start = ReadInt(LoadData)
-			doTrade = ReadInt(LoadData)
-			nextStep = ReadInt(LoadData)
-			point = ReadInt(LoadData)
-			moveAny = ReadInt(LoadData)
-			PlayerMove = ReadInt(LoadData)
-			player_Energy = ReadInt(LoadData)
-			score = ReadInt(LoadData)
-			lives = ReadInt(LoadData)
-			creditPoints = ReadInt(LoadData)
-			pointMinimum = ReadInt(LoadData)
-			jumpAllow = ReadInt(LoadData)
-			tut = ReadInt(LoadData)
-			text_var = ReadInt(LoadData)
-			doTut = ReadInt(LoadData)
-			doDrawPlayer = ReadInt(LoadData)
-			movX = ReadInt(LoadData)
-			movY = ReadInt(LoadData)
-			CloseFile(LoadData)
-		Else
-		RuntimeError "Error: Could not find 'Save.dat'!"
+	If(KeyHit(63)) Then
+		If(FileType("savegame.dat")=1) Then
+			stream = ReadFile("savegame.dat")
+			level = ReadInt(stream)
+			start = ReadInt(stream)
+			doTrade = ReadInt(stream)
+			nextStep = ReadInt(stream)
+			point = ReadInt(stream)
+			moveAny = ReadInt(stream)
+			PlayerMove = ReadInt(stream)
+			playerEnergy = ReadInt(stream)
+			score = ReadInt(stream)
+			lives = ReadInt(stream)
+			creditPoints = ReadInt(stream)
+			pointMinimum = ReadInt(stream)
+			jumpAllow = ReadInt(stream)
+			tut = ReadInt(stream)
+			text_var = ReadInt(stream)
+			doTut = ReadInt(stream)
+			doDrawPlayer = ReadInt(stream)
+			movX = ReadInt(stream)
+			movY = ReadInt(stream)
+			CloseFile(stream)
 		EndIf
 	EndIf
 End Function 
@@ -3210,89 +3081,82 @@ Type Image
 	Field animated
 End Type
 
-;Type for the Coin:
-Type Coins
-	Field Coinx
-	Field Coiny
-	Field Sort
-End Type
-
-;Type for Energy objects:
-Type Energys
-	Field en_x
-	Field en_y
+Type Coin
+	Field coinX
+	Field coinY
 	Field sort
 End Type
 
-;Type for all math items:
+Type Energy
+	Field enX
+	Field enY
+	Field sort
+End Type
+
 Type School
-	Field School_x
-	Field School_y
-	Field School_sort
+	Field schoolX
+	Field schoolY
+	Field schoolSort
 End Type 
 
-;type for less energy
-Type Less_energys
-	Field less_en_x
-	Field less_en_y
-	Field less_en_sort
+Type LessEnergy
+	Field lessEnX
+	Field lessEnY
+	Field lessEnSort
 End Type 
 
-;monsters
 Type Monster
-	Field Monster_type
-	Field Pos_x
-	Field Pos_y
-	Field Direction
-	Field Anim_counter
-	Field Frame 
-	Field Start_x
-	Field M_energy
+	Field sort
+	Field posX
+	Field posY
+	Field direction
+	Field animCounter
+	Field frame 
+	Field startX
+	Field energy
 End Type 
 
-;teachers
 Type Teacher
-	Field pos_x
-	Field pos_y
+	Field posX
+	Field posY
 	Field frame
 	Field direction
-	Field anim_counter
-	Field start_x
+	Field animCounter
+	Field startX
 End Type 
 
 Type Sneak
-	Field pos_x
-	Field pos_y
+	Field posX
+	Field posY
 	Field frame
 	Field direction
-	Field anim_counter
-	Field start_x
+	Field animCounter
+	Field startX
 End Type 
 
-;shoot-type
 Type ShootRight
-	Field shoot_x
-	Field shoot_y
+	Field shootX
+	Field shootY
 End Type
 
 Type ShootLeft
-	Field shoot_x
-	Field shoot_y
+	Field shootX
+	Field shootY
 End Type 
 
 ;level door
 Type Door
-	Field pos_x
-	Field pos_y
+	Field posX
+	Field posY
 	Field frame
 End Type 
 
-Type Pause
-	Field pos_x
-	Field pos_y
+Type Rest
+	Field posX
+	Field posY
 	Field sort
 End Type
 ;~IDEal Editor Parameters:
-;~F#1C4#1CD#1DF#1E7#1F0#201#226#230#23E#257#2FF#538#546#561#56C#5FE#6EA#70C#713#73D
-;~F#7A2#7A9#7D4#819#824#833#84C#85B#8A1#8D8#A00#A43#B61#B97#BA1#BAD#BD9#C23#C68
+;~F#1EE#56F#57A#6E9#763#7C6#7D1#881#9A9#B49#B56#B72#BBB#C06#C0B#C11#C17#C1D#C23#C2E
+;~F#C37#C40#C45#C4B#C51
 ;~C#Blitz3D

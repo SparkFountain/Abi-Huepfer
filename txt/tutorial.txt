@@ -1,0 +1,60 @@
+Herzlich willkommen beim Abi-Hüpfer!
+In diesem Tutorial, der so genannten Einführungsphase, wirst du mit den wichtigsten Elementen des Spiels vertraut gemacht.
+Bist du bereit? Drücke auf [Enter], um fortzufahren.
+(Hinweis: Du kannst dieses Tutorial mit einem Cheat überspringen, indem du Strg+C drückst und dann 'Level+' eingibst.)
+Du solltest erst einmal einige grundlegende Dinge über das Abitur wissen.
+Wie im richtigen Leben besteht der Weg zum Abitur aus vier Kurshalbjahren und den Abi-Prüfungen.
+Für jedes Halbjahr gibt es einen Level, in dem du Punkte sammelst, die du später für das Abitur brauchst.
+Die Schwierigkeitsstufe steigt mit jedem Level an.
+Wenn du alle vier Kurshalbjahre abgeschlossen hast, wirst du zum letzten Level, dem Abitur, zugelassen.
+Du brauchst nach jedem Kurshalbjahr eine bestimmte Anzahl an Punkten, um weiter zu kommen.
+Solltest du nicht genügend Punkte haben, musst du versuchen, den Level noch einmal zu absolvieren.
+Du hast für alle vier Kurshalbjahre insgesamt fünf Versuche.
+Kommen wir nun zur Steuerung.
+Du kannst deinen Spieler mit den Pfeiltasten nach links und rechts bewegen.
+Gehe nun zu dem Wurzelzeichen.
+Es gibt neun Fächer, für die du unabhängig voneinander Punkte sammelst.
+Du benötigst nach jedem Level eine bestimmte Punktzahl, um weiter zu kommen.
+Wenn du durch solch ein Symbol wie dieses Wurzelzeichen läufst, sammelst du es automatisch auf.
+Dir wird angezeigt, zu welchem Unterrichtsthema das Symbol passt und für welches Fach es dir Punkte bringt.
+Gehe nun zu dem Sandwich.
+Jeder Schüler braucht Energie, um gute Leistungen zu erbringen.
+Du hast links oben am Bildschirm eine Energieanzeige in Prozent.
+Achte darauf, dass deine Energie nie auf 0% sinkt, denn dann wirst du ohnmächtig und musst den Level noch einmal wiederholen.
+Momentan ist deine Energie bei 50%. Wenn du nun das Sandwich isst, siehst du, wie deine Energie zunimmt.
+Siehst du diese dreckige Toilette vor dir?
+Es soll Schulen geben, wo die Toiletten regelmäßig mutwillig verschmutzt werden...
+Wenn du mal ganz dringend musst und drei dreckverschmierte Klos zur Auswahl hast, kann dir schon mal übel werden.
+Da du nun das Toiletten-Symbol berührt hast, wirst du gleich sehen, wie deine Energie schwindet.
+Außer Ekel erregenden Toiletten gibt es auch Monster in der Schule, die einen überfallen und Energie abziehen.
+Rechts von dir siehst du ein faules, verschlafenes Monster, das furchtbare Langeweile ausstrahlt und den munteren Schüler
+schnell trostlos und gleichgültig werden lässt...
+Du kannst ein Monster jedoch bekämpfen, indem du mit Strg-rechts ein Schulbuch nach ihm wirfst.
+Probier' es mal aus! Wenn das Monster verschwunden ist, gehe weiter nach rechts.
+Andere Monster sorgen dafür, dass dir Punkte abgezogen werden, wenn du mit ihnen in Kontakt kommst.
+So beispielsweise dieser verkommene Gymnasiast, der mit Zigarette und Bier durchs Schulhaus läuft.
+Versuche ihn zu eliminieren! Gehe danach weiter nach rechts.
+Nun zu etwas anderem. Es wird dir vielleicht nicht immer möglich sein, allein durch das Sammeln
+von Objekten genug Punkte zu kriegen, um den Level zu verlassen.
+Deshalb kannst du zusätzlich Geldmünzen einheimsen, die im ganzen Schulhaus verteilt sind.
+Wofür du sie gebrauchen kannst, dazu kommen wir später.
+Um auf diese Mauer zu kommen, musst du hochspringen. Drücke auf die Leertaste, um zu springen.
+Du kannst dann die restlichen Coins einsammeln.
+Du wirst später feststellen, dass es noch andere Möglichkeiten gibt, an Geld zu kommen.
+Siehst du diese Personen dort oben? Spring zu ihnen hoch und berühre die erste.
+Das ist ein Lehrer. Lehrer kannst du daran erkennen, dass sie immer einen Stapel Klausurhefte unter dem Arm mit sich tragen.
+Außerdem sind sie größer als die Schüler. Mit einem Lehrer kannst du handeln, um dir mehr Punkte zu verschaffen.
+Für je fünfzehn Coins bekommst du einen Punkt von ihm geschenkt.
+Solche Bestechungen gibt es natürlich offiziell überhaupt nicht.
+Sobald sie passiert sind, verschwindet der betroffene Lehrer plötzlich wie vom Erdboden verschluckt...
+So wie jetzt. - Moment mal, da steht ja noch jemand neben dir. Geh zu ihm hin.
+Man könte denken, dass das ein weiterer Lehrer ist. Aber siehst du, dass er kleiner ist und hinterhältiger guckt?
+Das ist eine ganz gemeine Petze! Ein Fünftklässler, der sich als Lehrer verkleidet hat und dich veräppeln will.
+Wenn du mit ihm handelst, dann nimmt er dir dein ganzes Geld weg und rennt sofort zum Schulleiter.
+Und der zieht dir für den Bestechungsversuch auch noch einige deiner wertvollen Punkte ab! Ein schlechtes Geschäft...
+Also merke dir: Handle NIEMALS(!) mit einer Petze!
+Gehe nun zur Tür.
+Du hast es geschafft, die Einführungsphase ist hiermit beendet.
+Wenn du nun durch diese Tür gehst, kommst du ins erste Kurshalbjahr und es gibt kein Zurück mehr.
+Dein Geld und deine Punkte werden auf 0, deine Energie auf 100% zurückgesetzt.
+Viel Spaß und vor allem viel Glück auf deinem Weg zum (virtuellen) Abitur!

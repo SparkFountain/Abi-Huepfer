@@ -1,0 +1,16 @@
+CREDITS
+-----------------
+Programmierung, Leitung und Grafiken: Stefan Behrendt
+Hintergrundmusik: 'Jumpin in the School' von Stefan Behrendt
+Jump-Sound: 'JumpTut1'
+Sandwich- und Monstersound: 'Stranded II' von Unreal Software
+alle anderen Sounds von www.soft-ware.net
+Ein besonderer Dank für das Testen dieses Spiels geht an:
+Christian Radius
+Sebastian Nordenbruch
+Cornelius Irmscher
+Konstantin von Knorre
+Tobias König
+Anne Hofmeister
+...und alle anderen, falls ich jemanden vergessen haben sollte. Sry^^
+Mit [Enter] geht's wieder von vorn los...

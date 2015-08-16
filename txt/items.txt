@@ -1,0 +1,80 @@
+MATHEMATIK - Vereinfachung von Wurzelgleichungen
+MATHEMATIK - Kombinatorik und ungeordnete Entnahme von Stichproben
+MATHEMATIK - Integralrechnung und Kurvendiskussion
+MATHEMATIK - Kombinationen unter Berücksichtigung der der Elementanordnung
+MATHEMATIK - Fakultät
+MATHEMATIK - Bestimmte Integrale und deren Ober- und Untergrenzen
+MATHEMATIK - Vektorrechnung im zweidimensionalen karthesischen Koordinatensystem
+MATHEMATIK - Anstiegsberechnung über die erste Ableitung der Funktion
+MATHEMATIK - Verhalten einer Funktion im Unendlichen
+MATHEMATIK - Unter Schülern gebräuchliche Faustformeln sind eben nicht alles!
+ENGLISCH - 'Yes we can' => Politic of President Barack Obama in the USA
+ENGLISCH - Welsh tea traditions
+ENGLISCH - Be careful with your sentence structure: Keep in mind the SPO-rule!
+ENGLISCH - Symbolic flag of the United States of America
+GESCHICHTE - Die französische Revolution und der Aufstieg Napoleon Bonapartes
+GESCHICHTE - Die nationalsozialistische Diktatur 1933-1945 unter Adolf Hitler
+GESCHICHTE - Die DDR als Beispiel für einen demokratischen Diktaturstaat unter Führung Erich Honeckers
+GESCHICHTE - Die Zerstörung Karthagos als Folge des dritten punischen Krieges
+GESCHICHTE - Von der Märzrevolution bis zum Untergang der Weimarer Republik
+GESCHICHTE - Teilung Deutschlands in zwei unabhängige Staaten
+GESCHICHTE - Machterweiterung der Kommunisten durch Zusammenschluss der SPD und KPD zur 'Einheitspartei'
+DEUTSCH - Goethes Faust als Beispiel für eine Menschheitsparabel
+DEUTSCH - Schillers Don Karlos als Beispiel für dessen eigene Konventionen und Motive
+DEUTSCH - Lessings Nathan der Weise als Beispiel für Aufklärungsliteratur des 18. Jahrhunderts
+DEUTSCH - Reihungen von Haupt- und Nebensätzen im Vergleich
+DEUTSCH - Moderne Sprach- und Artikulationsmethoden in Jugendkreisen
+DEUTSCH - Der Duden als Meilenstein deutscher Sprachgeschichte
+SPORT - Gerätturnen am Parallelbarren
+SPORT - Armkrafttraining an Ringen
+SPORT - Badminton
+SPORT - Fußball
+SPORT - Leichtathletik
+SPORT - Kletterübungen an der Sprossenwand
+SPORT - Bocksprung
+SPORT - Bekanntgabe der drei Sieger
+GEOGRAFIE - Globale Disparitäten und Verflechtungen
+GEOGRAFIE - Anwendung der Informationen aus physischen Karten im Atlas
+GEOGRAFIE - Hoch- und Tiefdruckgebiete und deren Klimabeeinflussung
+GEOGRAFIE - Fair Trade (c) als globale Handelsorganisation, die sich für mehr Gerechtigkeit einsetzt
+GEOGRAFIE - Geysire und deren Bedeutung für Island
+GEOGRAFIE - Der Wasserhaushalt im Ökosystem Wald
+MUSIK - Wie sich das zwölftönige Notensystem in Europa durchgesetzt hat
+MUSIK - Instrumente in anderen Kulturen der Welt
+MUSIK - Entwicklung der Notationsform im Laufe der Musikgeschichte
+MUSIK - Elektrische Musik als neuartiges Phänomen des 20. Jahrhunderts
+MUSIK - Aufbau und Funktionsweise eines Klaviers
+MUSIK - Der Dirigent als leitendes Organ des Orchesters im Musiktheater
+MUSIK - Expressionistische Musik Arnold Schönbergs und deren Folgen für das menschliche Gehör
+MUSIK - Definition des Grundtons im Notensystem mithilfe des Notenschlüssels
+CHEMIE - Elektronenübertragung bei der Redox-Reaktion
+CHEMIE - Der Bunsenbrenner und dessen Strahlpumpen-Prinzip
+CHEMIE - Ammoniak und dessen Beeinträchtigung des Riechorgans bei Übergenuss
+CHEMIE - Explosive Reaktionen nur mit Schutzbrille durchführen!
+CHEMIE - Das 'Zucker-Wasser-Salz'-Experiment und dessen Beliebtheit bei jungen Schülern
+CHEMIE - C4 als Beispiel für formbaren Plastiksprengstoff
+INFORMATIK - PlayRay (c), die von Schülern im Informatikunterricht der Oberstufe meistbesuchte Website
+INFORMATIK - Entwicklung sechsachsiger Joysticks zur Steuerung des Seitenruders in Flugsimulatoren
+INFORMATIK - Ablösung der VGA- und PS2-Stecker durch den vielseitig brauchbaren USB-Anschluss
+INFORMATIK - Entwicklung des World Wide Webs
+INFORMATIK - Google (c) verschafft sich die Weltherrschaft mit Satellitenüberwachung der Erde
+INFORMATIK - Peripheriegeräte und automatische Treibererkennung in Windows (r)
+ABITUR DEUTSCH - Mit dem Abiturwissen 2009 unter der Bank geht das Deutsch-Abi bestimmt nicht schief!
+ABITUR DEUTSCH - In Schillers Schädel hat schon Goethe seinerzeit geniale poetische Gedanken entdeckt...
+ABITUR DEUTSCH - Mit Mephisto an der Seite kannst du alles haben, was du willst - auch ein Deutsch-Abi!
+ABITUR ENGLISCH - Zweisprachige Wörterbücher sind ja leider verboten. Wer trotzdem eins hat, hat's besser!
+ABITUR ENGLISCH - Selbst Briten schwören auf 'German Bratwurst' - nimm einen Haps und schreibe gestärkt weiter!
+ABITUR ENGLISCH - Wie lautet die beliebte Schüler-Fluchformel? Richtig, 'Holy Shit'. Egal, Kopf hoch!
+ABITUR MATHEMATIK - Dieser Super-Taschenrechner spuckt dir die Nullstellen einer Gleichung 6. Grades in 0,02s aus!
+ABITUR MATHEMATIK - Stell dir vor, du hättest unendlich viel Ahnung... Mit diesem Symbol wird es möglich!
+ABITUR MATHEMATIK - Prof. Dr. Herbert Henning. Prima! Was der nicht kann, hat im Mathe-Abitur sowieso nichts zu suchen!
+ABITUR CHEMIE - Schreib einfach auf, dass ein Apfel Strom leitet. Vielleicht kriegst du ja 'n paar Punkte dafür...
+ABITUR CHEMIE - Kleiner Tipp: Das ist ein Gefahrensymbol nach Richtlinie 67/548/EWG der Gefahrenstoffverordnung :).
+ABITUR CHEMIE - Das ist ein ultimatives PSE mit über 3700 Elementen, die speziell fürs Abitur erfunden wurden...
+ABITUR GEOGRAFIE - Asien, Land der Sonne, der Russen und Chinesen, der Atomwaffen und des Ehrenmordes
+ABITUR GEOGRAFIE - Europa, Land der Vielfalt, der britischen Küche, der fehlenden Bildungspolitik und der Abwrackprämie.
+ABITUR GEOGRAFIE - Nordamerika, erst Land Washingtons, dann Jeffersons, ..., dann der Bushs, heute Obamas Machtimperium.
+ABITUR GEOGRAFIE - Südamerika, Land der Latinos, der Demokratur, des Hanfs und der korrupten Drogenbosse.
+ABITUR GEOGRAFIE - Australien, komische Insel jwd, mit Wüste, Kängurus, Brandstiftern und sogar mit Warmwasser!
+ABITUR GEOGRAFIE - Afrika, Land des Kinderreichtums, des dreckigen Wassers und der fehlenden Infrastruktur.
+ABITUR GEOGRAFIE - Antarktis, große Eisplatte, die (noch) nicht den USA gehört; wohl eine Fehlerschaffung Gottes.

@@ -1,0 +1,33 @@
+Gratuliere! Du hast alle vier Kurshalbjahre erfolgreich absolviert und wirst hiermit zum Abitur zugelassen.
+Bevor du jedoch gleich in die letzte große Herausforderung startest, hier noch ein paar wichtige Hinweise:
+- Du wirst im Abiturlevel mehr Energie verlieren als sonst, wenn du mit Monstern und anderen Items zusammenstößt.
+Aus diesem Grund gibt es an einigen Orten Energiedrops. Sie sehen aus wie gewöhnliche Münzen mit einem E in der Mitte.
+Ein Energiedrop gibt dir viermal so viel Energie wie ein einfaches Sandwich.
+- Es gibt ein neues Monster, den HONK (Hauptschüler ohne nennenswerte Kenntnisse). Er zieht dir sowohl Energie als auch
+Punkte ab, wenn du mit ihm zusammenläufst. Außerdem sind Honks schwerer zu besiegen und treten oftmals in Gruppen auf.
+- Die Lehrer haben während der Abiprüfungen die Aufgabe, die Schüler zu beobachten und sie am Schummeln zu hindern.
+Es wäre natürlich zu auffällig, wenn du einen Lehrer während der Prüfung versuchen würdest zu bestechen.
+Aus diesem Grund laufen im Abilevel keine Lehrer herum; du musst dir also deine Punkte ganz alleine beschaffen!
+(Das bedeutet natürlich auch, dass kein Geld im Schulhaus herumliegt wie üblich, und da lästige Fünftklässler im Abitur
+nichts zu suchen haben, wird es auch keine Petzen geben.)
+- Du wirst insgesamt fünf Prüfungen zu absolvieren haben, die schriftlichen in Deutsch, Mathematik, Englisch und Chemie
+und eine mündliche Prüfung in Geografie.
+In den schriftlichen Prüfungen gibt es pro Fach drei neue Symbole, die du suchen musst.
+Am Ende des Levels musst du von den insgesamt 12 Symbolen mindestens 8 eingesammelt haben, sonst hast du nicht bestanden.
+In der mündlichen Prüfung sind Symbole aller 7 Kontinente unserer Erde versteckt. Du musst sie ALLE finden, um
+zu bestehen!
+-Schon eine einzige Abiturprüfung kann sehr lang werden... Aus diesem Grund sind an einigen Stellen in den beiden
+Abiturleven kurze Pausen eingebaut. Sie sehen aus wie Viertel- und Achtelpausen in der Notationsschrift.
+Sobald du ein Pausenzeichen berührst, bleiben ALLE Monster im ganzen Level für einen kurzen Moment dort stehen, wo sie
+gerade sind. Dir wird in dieser Zeit auch keine Energie abgezogen, wenn du gegen ein Monster oder eine Toilette oder
+etwas dergleichen läufst. Je nach Art der Pause erhälst du eine Viertel- oder eine Achtelminute lang diesen Bonus.
+- Falls es dir beim ersten Mal nicht gelingen sollte, das Abitur zu bestehen, macht nichts: Du hast für jeden der beiden
+Abiturlevel jeweils 3 Versuche! Also bloß keine Panik :)
+So, jetzt weißt du bescheid. Bleibt nur noch eins: VIEL ERFOLG BEIM ABITUR!!!
+HERZLICHEN GLÜCKWUNSCH!!!
+Du hast es endlich geschafft und erhälst nun dein wohlverdientes Abitur.
+Du hast insgesamt 
+ Punkte gesammelt.
+Das entspricht einer virtuellen Note von 
+Du darfst dir dieses Abiturzeugnis nun ausdrucken und es dir dann an den Hut stecken.
+Bitte [Enter] drücken um fortzufahren...
