@@ -22,11 +22,8 @@ Forever
 CloseDir(loadingDir)
 DebugLog("loading done")
 
-
-
 ;stream for IO
 Global stream
-
 
 ; all non-moving graphics
 Global coin = LoadImage("gfx/1Coin.bmp")			; 1 coin
@@ -320,8 +317,8 @@ Global playerPosY = (screenHeight/2) ; /
 Global frame = 0		 ; the frame 
 Global time = 0			 ; checks when a frame has to be changed
 Global movingRight ; whether he moves in right or left direction
-Global movX = -288 ; these variables change if the player is moving
-Global movY = 480 ; starting point level 1: right bottom
+Global movX = -400 ; these variables change if the player is moving
+Global movY = 350 ; starting point level 1: right bottom
 
 ;Abi-specific
 Global mark#	; what mark gets the player at the end?
@@ -350,8 +347,10 @@ Global throwBook = LoadSound("sfx/ThrowBook.wav")	  ; book is thrown
 Global eat = LoadSound("sfx/Eat.wav")				  ; eats a sandwich
 Global monsterDie = LoadSound("sfx/MonsterDie.wav")	  ; monster disappears
 Global levelAgain = LoadSound("sfx/LevelAgain.wav")	  ; when restarting a level
-Global backGround = PlayMusic("sfx/Jumpin' in the School.mid") ; background melody
-ChannelVolume(backGround,0.33)
+
+;MAKE THIS FASTER??
+;Global backGround = PlayMusic("sfx/Jumpin' in the School.mid") ; background melody
+;ChannelVolume(backGround,0.33)
 
 ;texts for the tutorial level
 Dim tutText$(60)
@@ -396,9 +395,9 @@ CloseFile(stream)
 
 
 ; the level coordinates
-Const MOVX_LVL1 = (-288)
-Const Movy_Lvl1 = 480
-Const MOVX_LVL2 = 5440
+Const MOV_X_LVL1 = (-288)
+Const MOV_Y_LVL1 = 480
+Const MOV_X_LVL2 = 5440
 Const Movy_Lvl2 = 480
 Const MOVX_LVL3 = (-288)
 Const Movy_Lvl3 = (-96)
@@ -829,518 +828,518 @@ Function SchoolItemsCollision()
 			message = 7
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school 
+			Delete newItem.School 
 		EndIf
 		Case 8
 			If ImagesCollide(function5,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 8
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school 
+			Delete newItem.School 
 			EndIf
 		Case 9
 			If ImagesCollide(function6,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 9
 			creditPoints = creditPoints + 12
 			PlaySound itemCollect
-			Delete newItem.school 
+			Delete newItem.School 
 		EndIf
 		Case 10
 			If ImagesCollide(function7,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 10
 			creditPoints = creditPoints + 15
 			PlaySound itemCollect
-			Delete newItem.school 
+			Delete newItem.School 
 		EndIf
 		Case 11
 			If ImagesCollide(yeswecan,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 11
 			creditPoints = creditPoints + 4
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 12
 			If ImagesCollide(teatime,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 12
 			creditPoints = creditPoints + 6
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 13
 			If ImagesCollide(spo,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 13
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 14
 			If ImagesCollide(usa,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 14
 			creditPoints = creditPoints + 11
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 15
 			If ImagesCollide(napoleon,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 15
 			creditPoints = creditPoints + 4
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 16
 			If ImagesCollide(hitler,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 16
 			creditPoints = creditPoints + 4
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 17
 			If ImagesCollide(honecker,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 17
 			creditPoints = creditPoints + 4
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 18
 			If ImagesCollide(fight,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 18
 			creditPoints = creditPoints + 7
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 19
 			If ImagesCollide(dates,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 19
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 20
 			If ImagesCollide(germany,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 20
 			creditPoints = creditPoints + 13
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 21
 			If ImagesCollide(sed,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 21
 			creditPoints = creditPoints + 8
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf 
 		Case 22
 			If ImagesCollide(goethe,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 22
 			creditPoints = creditPoints + 3
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 23
 			If ImagesCollide(schiller,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 23
 			creditPoints = creditPoints + 5
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 24
 			If ImagesCollide(lessing,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 24
 			creditPoints = creditPoints + 6
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 25
 			If ImagesCollide(parataxis,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 25
 			creditPoints = creditPoints + 8
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 26
 			If ImagesCollide(blackboard,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 26
 			creditPoints = creditPoints + 16
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 27
 			If ImagesCollide(duden,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 27
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 28
 			If ImagesCollide(bars,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 28
 			creditPoints = creditPoints + 5
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 29
 			If ImagesCollide(rings,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 29
 			creditPoints = creditPoints + 5
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 30
 			If ImagesCollide(badminton,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 30
 			creditPoints = creditPoints + 8
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 31
 			If ImagesCollide(football,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 31
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 32
 			If ImagesCollide(run,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 32
 			creditPoints = creditPoints + 11
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 33
 			If ImagesCollide(wallbars,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 33
 			creditPoints = creditPoints + 15
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 34
 			If ImagesCollide(stand,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 34
 			creditPoints = creditPoints + 13
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 35
 			If ImagesCollide(winnersteps,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 35
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 36
 			If ImagesCollide(globe,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 36
 			creditPoints = creditPoints + 6
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 37
 			If ImagesCollide(atlas,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 37
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 38
 			If ImagesCollide(weather,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 38
 			creditPoints = creditPoints + 14
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 39
 			If ImagesCollide(friends,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 39
 			creditPoints = creditPoints + 20
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 40
 			If ImagesCollide(geyser,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 40
 			creditPoints = creditPoints + 11
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 41
 			If ImagesCollide(watercyclus,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 41
 			creditPoints = creditPoints + 12
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 42
 			If ImagesCollide(note,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 42
 			creditPoints = creditPoints + 4
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 43
 			If ImagesCollide(guitar,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 43
 			creditPoints = creditPoints + 7
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 44
 			If ImagesCollide(notepaper,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 44
 			creditPoints = creditPoints + 8
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 45
 			If ImagesCollide(loudspeaker,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 45
 			creditPoints = creditPoints + 11
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 46
 			If ImagesCollide(piano,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 46
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 47
 			If ImagesCollide(conductor,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 47
 			creditPoints = creditPoints + 12
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 48
 			If ImagesCollide(buzz,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 48
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf	
 		Case 49
 			If ImagesCollide(clefs,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 49
 			creditPoints = creditPoints + 14
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 50
 			If ImagesCollide(testglass,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 50
 			creditPoints = creditPoints + 9
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 51
 			If ImagesCollide(burner,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 51
 			creditPoints = creditPoints + 4
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 52
 			If ImagesCollide(nh3,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 52
 			creditPoints = creditPoints + 12
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 53
 			If ImagesCollide(goggles,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 53
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 			EndIf
 		Case 54
 			If ImagesCollide(kettle,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 54
 			creditPoints = creditPoints + 14
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 55
 			If ImagesCollide(c4,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 55
 			creditPoints = creditPoints + 7
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 56
 			If ImagesCollide(playray,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 56
 			creditPoints = creditPoints + 13
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 57
 			If ImagesCollide(joystick,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 57
 			creditPoints = creditPoints + 7
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 58
 			If ImagesCollide(pc_back,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 58
 			creditPoints = creditPoints + 8
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 59
 			If ImagesCollide(www,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 59
 			creditPoints = creditPoints + 7
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 60
 			If ImagesCollide(google,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 60
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 61
 			If ImagesCollide(printer,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 61
 			creditPoints = creditPoints + 13
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 62
 			If ImagesCollide(abihelp,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 62
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 63
 			If ImagesCollide(schillershead,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 63
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf	
 		Case 64
 			If ImagesCollide(mephisto,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 64
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 65
 			If ImagesCollide(dictionary,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 65
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 66
 			If ImagesCollide(bratwurst,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 66
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 67
 			If ImagesCollide(holyshit,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 67
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 68
 			If ImagesCollide(calculator,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 68
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 69
 			If ImagesCollide(infinite,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 69
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 70
 			If ImagesCollide(henning,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 70
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 71
 			If ImagesCollide(electricapple,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 71
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 72
 			If ImagesCollide(acid,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 72
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 73
 			If ImagesCollide(pse,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 73
 			creditPoints = creditPoints + 30
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 74
 			If ImagesCollide(asia,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 74
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 75
 			If ImagesCollide(europe,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 75
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 76
 			If ImagesCollide(northamerica,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 76
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 77
 			If ImagesCollide(southamerica,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 77
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 78
 			If ImagesCollide(australia,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 78
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 79
 			If ImagesCollide(africa,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 79
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		Case 80
 			If ImagesCollide(antarctica,((newItem\schoolX)-movX),((newItem\schoolY)-movY),0,player,playerPosX,playerPosY,0) Then
 			message = 80
 			creditPoints = creditPoints + 10
 			PlaySound itemCollect
-			Delete newItem.school
+			Delete newItem.School
 		EndIf
 		End Select
 	Next
@@ -1595,10 +1594,10 @@ Function ChooseLevel()
 				GivePos = 1
 				Select level
 					Case 2
-						movX = MOVX_LVL1
-						movY = Movy_Lvl1
+						movX = MOV_X_LVL1
+						movY = MOV_Y_LVL1
 					Case 3
-						movX = MOVX_LVL2
+						movX = MOV_X_LVL2
 						movY = Movy_Lvl2
 					Case 4
 						movX = MOVX_LVL3
@@ -1623,10 +1622,10 @@ Function ChooseLevel()
 				GivePos = 0
 				Select level
 					Case 2
-						movX = MOVX_LVL1
-						movY = Movy_Lvl1
+						movX = MOV_X_LVL1
+						movY = MOV_Y_LVL1
 					Case 3
-						movX = MOVX_LVL2
+						movX = MOV_X_LVL2
 						movY = Movy_Lvl2
 					Case 4
 						movX = MOVX_LVL3
@@ -1654,10 +1653,10 @@ Function ChooseLevel()
 				GivePos = 1
 				Select level
 					Case 2
-						movX = MOVX_LVL1
-						movY = Movy_Lvl1
+						movX = MOV_X_LVL1
+						movY = MOV_Y_LVL1
 					Case 3
-						movX = MOVX_LVL2
+						movX = MOV_X_LVL2
 						movY = Movy_Lvl2
 					Case 4
 						movX = MOVX_LVL3
@@ -1682,10 +1681,10 @@ Function ChooseLevel()
 				GivePos = 0
 				Select level
 					Case 2
-						movX = MOVX_LVL1
-						movY = Movy_Lvl1
+						movX = MOV_X_LVL1
+						movY = MOV_Y_LVL1
 					Case 3
-						movX = MOVX_LVL2
+						movX = MOV_X_LVL2
 						movY = Movy_Lvl2
 					Case 4
 						movX = MOVX_LVL3
@@ -1733,39 +1732,37 @@ Function ChooseLevel()
 	EndIf
 End Function
 
-
 Function MonsterCollision()
-If moveAny = 1 Then 
+	If(moveAny<>1) Then Return
+	
 	If(MilliSecs()-restTime>timeValue) Then	; if player didn't collect a Rest
 		For newMonster.Monster = Each Monster
-			If(newMonster\sort=1) Then
-				If(ImagesCollide(monsterLazy,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0)) Then
-					playerEnergy = playerEnergy - 15
-		Delete newMonster.Monster
-	EndIf 
-ElseIf newMonster\sort = 2 Then
-	If ImagesCollide(monsterNaughty,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0) Then
-		creditPoints = creditPoints - 15
-		Delete newMonster.Monster
-	EndIf 
-ElseIf newMonster\sort = 3 Then
-	If ImagesCollide(monsterZero,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0) Then
-		playerEnergy = playerEnergy - 25
-		Delete newMonster.Monster
-	EndIf 
-ElseIf newMonster\sort = 4 Then 
-	If ImagesCollide(monsterHonk,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0) Then
-		playerEnergy = playerEnergy - 30
-		creditPoints = creditPoints - Rnd(10,30)
-		Delete newMonster.Monster
-	EndIf 
-	EndIf 
-Next
-
-EndIf
-EndIf  
-End Function 
-
+			Select newMonster\sort
+				Case 1
+					If(ImagesCollide(monsterLazy,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0)) Then
+						playerEnergy = playerEnergy-15
+						Delete newMonster.Monster
+					EndIf
+				Case 2
+					If(ImagesCollide(monsterNaughty,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0)) Then
+						creditPoints = creditPoints-15
+						Delete newMonster.Monster
+					EndIf 
+				Case 3
+					If(ImagesCollide(monsterZero,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0)) Then
+						playerEnergy = playerEnergy-25
+						Delete newMonster.Monster
+					EndIf 
+				Case 4
+					If(ImagesCollide(monsterHonk,(newMonster\posX)-movX,(newMonster\posY)-movY,0,player,playerPosX,playerPosY,0)) Then
+						playerEnergy = playerEnergy-30
+						creditPoints = creditPoints-Rnd(10,30)
+						Delete newMonster.Monster
+					EndIf 
+			End Select
+		Next
+	EndIf
+End Function
 
 Function DrawTeacher()
 	Local newTeacher.Teacher
@@ -2041,86 +2038,86 @@ Function DrawShoot()
 	Local newBookRight.ShootRight
 	For newBookRight.ShootRight = Each ShootRight
 		DrawImage(book,(newBookRight.ShootRight\shootX)-movX,(newBookRight.ShootRight\shootY)-movY)
-		newBookRight\shootX = newBookRight\shootX + 9
+		newBookRight\shootX = newBookRight\shootX+9
 	Next
 	
 	Local newBookLeft.ShootLeft
 	For newBookLeft.ShootLeft = Each ShootLeft
 		DrawImage(book,(newBookLeft.ShootLeft\shootX)-movX,(newBookLeft.ShootLeft\shootY)-movY)
-		newBookLeft\shootX = newBookLeft\shootX - 9
+		newBookLeft\shootX = newBookLeft\shootX-9
 	Next
-End Function 
-
+End Function
 
 Function ShootCollision()
+	Local newBookRight.ShootRight
 	For newMonster.Monster = Each Monster
-	For newBookRight.shootright = Each ShootRight
-		If ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterLazy,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-			Delete newMonster.Monster
-		Delete newBookRight.shootright
-		PlaySound monsterDie
-		shootAble = 1 
-	ElseIf ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterNaughty,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-		Delete newMonster.Monster
-		Delete newBookRight.shootright
-		PlaySound monsterDie
-		shootAble = 1
-	ElseIf ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterZero,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-		Delete newMonster.Monster
-		Delete newBookRight.shootright
-		PlaySound monsterDie
-		shootAble = 1
-	ElseIf ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterHonk,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-		Delete newMonster.Monster
-		Delete newBookRight.shootright
-		PlaySound monsterDie
-		shootAble = 1
-	EndIf
-Next
-Next
+		For newBookRight.ShootRight = Each ShootRight
+			If(ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterLazy,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookRight.ShootRight
+				PlaySound(monsterDie)
+				shootAble = 1 
+			ElseIf(ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterNaughty,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookRight.ShootRight
+				PlaySound(monsterDie)
+				shootAble = 1
+			ElseIf(ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterZero,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookRight.ShootRight
+				PlaySound(monsterDie)
+				shootAble = 1
+			ElseIf(ImagesCollide(book,((newBookRight\shootX)-movX),((newBookRight\shootY)-movY),0,monsterHonk,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookRight.ShootRight
+				PlaySound(monsterDie)
+				shootAble = 1
+			EndIf
+		Next
+	Next
+	
+	Local newBookLeft.ShootLeft
+	For newMonster.Monster = Each Monster
+		For newBookLeft.ShootLeft = Each ShootLeft
+			If(ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterLazy,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookLeft.ShootLeft
+				PlaySound(monsterDie)
+				shootAble = 1 
+			ElseIf(ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterNaughty,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookLeft.ShootLeft
+				PlaySound(monsterDie)
+				shootAble = 1
+			ElseIf(ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterZero,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookLeft.ShootLeft
+				PlaySound(monsterDie)
+				shootAble = 1
+			ElseIf(ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterHonk,((newMonster\posX)-movX),((newMonster\posY)-movY),0)) Then
+				Delete newMonster.Monster
+				Delete newBookLeft.ShootLeft
+				PlaySound(monsterDie)
+				shootAble = 1
+			EndIf
+		Next
+	Next
 
-For newMonster.Monster = Each Monster
-	For newBookLeft.shootleft = Each ShootLeft
-		If ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterLazy,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-			Delete newMonster.Monster
-		Delete newBookLeft.shootleft
-		PlaySound monsterDie
-		shootAble = 1 
-	ElseIf ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterNaughty,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-		Delete newMonster.Monster
-		Delete newBookLeft.shootleft
-		PlaySound monsterDie
-		shootAble = 1
-	ElseIf ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterZero,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-		Delete newMonster.Monster
-		Delete newBookLeft.shootleft
-		PlaySound monsterDie
-		shootAble = 1
-	ElseIf ImagesCollide(book,((newBookLeft\shootX)-movX),((newBookLeft\shootY)-movY),0,monsterHonk,((newMonster\posX)-movX),((newMonster\posY)-movY),0) Then
-		Delete newMonster.Monster
-		Delete newBookLeft.shootleft
-		PlaySound monsterDie
-		shootAble = 1
-	EndIf
-Next
-Next
-
-;if the book doesnt collide with any item, it will be deleted after 1,5 seconds!
-For newBookRight.shootright = Each ShootRight
-	If (MilliSecs() - shootTime) > 1500 Then
-		Delete newBookRight.shootright
-	shootAble = 1
-	EndIf
-Next
-
-For newBookLeft.shootleft = Each ShootLeft
-	If (MilliSecs() - shootTime) > 1500 Then
-		Delete newBookLeft.shootleft
-	shootAble = 1
-	EndIf
-Next
+	;if the book doesnt collide with any item, it will be deleted after 1.5 seconds!
+	For newBookRight.ShootRight = Each ShootRight
+		If((MilliSecs()-shootTime)>1500) Then
+			Delete newBookRight.ShootRight
+			shootAble = 1
+		EndIf
+	Next
+	
+	For newBookLeft.ShootLeft = Each ShootLeft
+		If((MilliSecs()-shootTime)>1500) Then
+			Delete newBookLeft.ShootLeft
+			shootAble = 1
+		EndIf
+	Next
 End Function 
-
 
 Function PlayerJump()
 	If(jumpAllow<>1) Then Return	; if player is not at the beginning of tutorial level 
@@ -2133,46 +2130,44 @@ Function PlayerJump()
 		EndIf
 	EndIf ; otherwise, it would keep the player in the air
 	
-		;in Case of collision
-	If (currentLevel((playerPosX+movX+12) /32,(playerPosY+movY) /32)=1 Or currentLevel((playerPosX+movX) /32,(playerPosY+movY) /32)=1) And jump = True Then
-			jump = True
-			posYTemp = 0 
-		EndIf 
-
-		
-		
-	If jump = True Then
-		posYTemp = posYTemp - 1
-		movY = movY - posYTemp
+	;in Case of collision
+	If((currentLevel((playerPosX+movX+12) /32,(playerPosY+movY) /32)=1 Or currentLevel((playerPosX+movX) /32,(playerPosY+movY) /32)=1) And jump=True) Then
+		jump = True
+		posYTemp = 0 
+	EndIf 
+	
+	
+	If(jump=True) Then
+		posYTemp = posYTemp-1
+		movY = movY-posYTemp
 	EndIf
 	
-	If posYTemp <= 0 Then
-		If currentLevel((playerPosX+movX+12) /32,(playerPosY+movY+32) /32) = 1 Or currentLevel((playerPosX+movX+20) /32,(playerPosY+movY+32) /32) = 1 Then 
+	If(posYTemp<=0) Then
+		If(currentLevel((playerPosX+movX+12)/32,(playerPosY+movY+32)/32)=1 Or currentLevel((playerPosX+movX+20)/32,(playerPosY+movY+32)/32)=1) Then 
 			jump = False
-			temp_y = movY /32	;\
+			Local temp_y = movY /32	;\
 			movY = temp_y *32	;/ sets the exact position of Player if he stands in a tile
 		EndIf
 	EndIf
 	
 	
-	If jump = False Then
-		If currentLevel((playerPosX+movX+12) /32,(playerPosY+movY+32) /32) = 0 Then	;if there is no brick above him
+	If(jump=False) Then
+		If(currentLevel((playerPosX+movX+12)/32,(playerPosY+movY+32)/32)=0) Then	;if there is no brick above him
 			jump = True
 			posYTemp = 0
-		EndIf 
+		EndIf
 	EndIf 
 	
-	If movY < -416 Then
+	If(movY<-416) Then
 		movY = -416
-		jump=True
+		jump = True
 		posYTemp = 0
 	EndIf
 	
-	If movY >= 480 Then 
+	If(movY>=480) Then 
 		movY = 480		; the max. value of Movy must be set!
 		jump = False
 	EndIf
-		
 End Function 
 
 Function LoadLevel(number)
@@ -2283,8 +2278,8 @@ Function LoadLevel(number)
 		Case 2,3,4,5
 			pointMinimum = 70 ; here, the minimum of points that a player has to collect, is set
 			If(xyz=0) Then
-				movX = MOVX_LVL1
-				movY = Movy_Lvl1
+				movX = MOV_X_LVL1
+				movY = MOV_Y_LVL1
 				tut = 0
 			EndIf 
 			
@@ -2538,10 +2533,10 @@ Function ShowAbi()
 End Function 
 
 Function TextTutorial()
+	If(doTut<>1) Then Return
+	
 	SetFont(tutFont)
 	Color(200,200,0)
-	
-	If(doTut<>1) Then Return
 
 	;start the level
 	Select text_var
@@ -3030,7 +3025,7 @@ Function SaveGame()
 		WriteInt(stream,nextStep)
 		WriteInt(stream,point)
 		WriteInt(stream,moveAny)
-		WriteInt(stream,PlayerMove)
+		WriteInt(stream,playerMove)
 		WriteInt(stream,playerEnergy)
 		WriteInt(stream,score)
 		WriteInt(stream,lives)
@@ -3057,7 +3052,7 @@ Function LoadGame()
 			nextStep = ReadInt(stream)
 			point = ReadInt(stream)
 			moveAny = ReadInt(stream)
-			PlayerMove = ReadInt(stream)
+			playerMove = ReadInt(stream)
 			playerEnergy = ReadInt(stream)
 			score = ReadInt(stream)
 			lives = ReadInt(stream)
@@ -3157,6 +3152,7 @@ Type Rest
 	Field sort
 End Type
 ;~IDEal Editor Parameters:
-;~F#1EE#56F#57A#6E9#763#7C6#7D1#881#9A9#B49#B56#B72#BBB#C06#C0B#C11#C17#C1D#C23#C2E
-;~F#C37#C40#C45#C4B#C51
+;~F#1ED#56E#579#5EB#6C6#6E6#6ED#70E#760#767#788#7C3#7CE#7DD#7F2#802#849#87C#9A4#9E6
+;~F#B04#B3A#B44#B51#B6D#B82#BB6#BC2#BE4#C01#C06#C0C#C12#C18#C1E#C29#C32#C3B#C40#C46
+;~F#C4C
 ;~C#Blitz3D
