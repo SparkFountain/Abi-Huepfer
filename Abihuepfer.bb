@@ -1,13 +1,13 @@
 AppTitle("Abi-Huepfer 1.2") ; Title of the game and version
 
 ; Graphics, Buffer and Random generator
-Global screenWidth = 1024
-Global screenHeight = 768
+Global screenWidth = 800
+Global screenHeight = 800
 Graphics(screenWidth,screenHeight,32,2)
 SetBuffer(BackBuffer())
 SeedRnd(MilliSecs())
 
-Global frameTimer = CreateTimer(30)	; frametime: 30 Hz
+Global frameTimer = CreateTimer(60)	; frametime: 30 Hz
 
 ;load all static graphics
 Local loadingDir = ReadDir("gfx") 
